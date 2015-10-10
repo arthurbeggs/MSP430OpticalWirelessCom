@@ -1,4 +1,4 @@
-#include <msp430.h> 
+#include <msp430.h>
 #include <intrinsics.h>
 
 void sendArray(char *rx_buffer, int length);
@@ -9,7 +9,7 @@ volatile unsigned char send = 0;
 
 int main(void) {
     WDTCTL = WDTPW | WDTHOLD;	// Stop watchdog timer
-	
+
     // Configure GPIO
     P1DIR |= BIT0;				// Enable LED output
     P1REN |= BIT1;				// Enable internal resistor

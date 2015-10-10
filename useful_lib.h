@@ -11,9 +11,9 @@
 #include <msp430.h>
 
 //Sets the clock0
-extern void ___setup_clk0(long long int freq)
+extern void ___setup_clk0(long long int freq);
 
-//Sets an timerA0 using clock0
+//Sets a timerA0 using clock0
 extern void ___setup_timerA0();
 
 //Delay function using timerA0 in clock0

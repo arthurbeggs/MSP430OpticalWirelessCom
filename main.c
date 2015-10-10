@@ -6,10 +6,10 @@
 			Jessé Barreto de Barros - 10/0106510
  * Data: 14/09/2015
  */
- 
+
 
 //Libraries
-#include <msp430.h> //Common used library 
+#include <msp430.h> //Common used library
 #include <useful_lib.h> //Useful functions
 
 
@@ -18,12 +18,12 @@
 */
 int main(void) {
     WDTCTL = WDTPW | WDTHOLD;	// Stop watchdog timer
-	
+
 	//Configure clock system
     ___setup_clk0(16000000);
-	
-	
-	
-	
+
+
+
+
 	return 0;
 }
