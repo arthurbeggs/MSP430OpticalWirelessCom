@@ -1,8 +1,8 @@
 /* Univeridade de Brasilia - UnB
  * Departamento de Engenharia Eletrica - ENE
  * Projeto 2 - Comunicação serial com Código Morse
- * Alunos: 	Luan Hackel Araujo		-
-			Arthur Matos			-
+ * Alunos: 	Luan Hackel Araujo		- 12/0125781
+			Arthur Matos			- 12/0111089
 			Jessé Barreto de Barros - 10/0106510
  * Data: 14/09/2015
  */
