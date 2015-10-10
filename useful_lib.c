@@ -5,9 +5,9 @@
  *      Author: jesse
  */
 
-#include <useful_lib.h>
+#include "useful_lib.h"
 
-extend void ___setup_usci_A1(int baud_rate)
+extern void ___setup_usci_A1(int baud_rate)
 {
 	// Configure USCI module
     UCA1CTL1 = UCSWRST;			// Keep module on reset state

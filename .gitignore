@@ -36,3 +36,5 @@
 
 # Code Composer Studio
 /Debug
+/Debug__GNU__TI
+.launches/
