@@ -14,7 +14,7 @@ extend void ___setup_usci_A1(int baud_rate)
     UCA1CTL0 = 0x0;				// Async UART mode, no parity,
     							// 8-bit data, one stop bit, LSB first
     UCA1CTL1 |= UCSSEL_2; 		// BRCLK = SMCLK = 1MHz
-    UCA1BR0 = (baud_rate == 9600 ? 104 : );				// 9600 bps with 1MHz input clock
+    UCA1BR0 = (baud_rate == 9600 ? 104 : baud_rate == 4800 ? 208 : 417);	// 9600 bps with 1MHz input clock - 4800 and 2400
     UCA1BR1 = 0;
     UCA1MCTL = UCBRF_0 | UCBRS_1;	// Refer to table 34-4
     P4SEL |= BIT4 | BIT5;		// Configure I/O ports
