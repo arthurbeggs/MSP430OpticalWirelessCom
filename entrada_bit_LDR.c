@@ -2,10 +2,12 @@
  * Entrada de bit através do LDR ligado com divisor de tensão
  *   
  *       LDR     R=56Kohm
- *   _____O________[]___
- *   |        |        |
- *   |        |        |
- *  3.3v     P8.2     GND
+ *   _____O________NNN___
+ *   |        |         |
+ *   |        |         |
+ *  3.3v     P8.2      GND
+ *
+ *                             Autor: Luan Haickel Araujo
  */
 
 #include "msp430_lib3.h"
