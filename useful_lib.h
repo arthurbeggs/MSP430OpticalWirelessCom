@@ -25,6 +25,16 @@ void ___delay_ms(int delay);
 //Delay function using timerA0 in clock0 in seconds
 void ___delay_s(int delay);
 
+//Sets the USCI in A1
+extern void ___setup_usci_A1(int baud_rate);
+
+//Communication function to send a msg by usci A1
+extern void ___send_msg_usci_A1(char *rx_buffer, int msg_length);
+
+//Communication function to send a char by usci A1 
+extern void ___send_char_usci_A1(char rx);
+
+
 
 
 #endif /* USEFUL_LIB_H_ */
