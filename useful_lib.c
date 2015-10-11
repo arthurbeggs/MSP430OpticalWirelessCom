@@ -2,10 +2,20 @@
  * useful_lib.h
  *
  *  Created on: 16/09/2015
- *      Author: jesse
+ *      Author: Arthur, Luan e Jesse
  */
 
 #include "useful_lib.h"
+
+#ifdef ___INT_USCIA1
+	void* (*___int_uscia1)(void*);
+	void* ___int_uscia1arg;
+	#pragma vector=USCI_A1_VECTOR
+	__interrupt void UART_ISR(void)
+	{
+		(*___int_uscia1)(___int_uscia1arg);
+	}
+#endif
 
 extern void ___send_msg_usci_A1(char *rx_buffer, int msg_length)
 {

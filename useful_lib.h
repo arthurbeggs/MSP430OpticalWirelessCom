@@ -9,6 +9,7 @@
 #define USEFUL_LIB_H_
 
 #include <msp430.h>
+#include <stdlib.h>
 
 //Sets Universal Serial Communication Interface (USCI) A1
 extern void ___setup_usci_A1(int baud_rate);
