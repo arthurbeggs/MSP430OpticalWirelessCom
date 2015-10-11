@@ -2,12 +2,39 @@
  * useful_lib.h
  *
  *  Created on: 16/09/2015
- *      Author: jesse
+ *      Author: Arthur, Luan e Jesse
  */
 
-#include <useful_lib.h>
+#include "useful_lib.h"
 
-extend void ___setup_usci_A1(int baud_rate)
+#ifdef ___INT_USCIA1
+	void* (*___int_uscia1)(void*);
+	void* ___int_uscia1arg;
+	#pragma vector=USCI_A1_VECTOR
+	__interrupt void UART_ISR(void)
+	{
+		(*___int_uscia1)(___int_uscia1arg);
+	}
+#endif
+
+extern void ___send_msg_usci_A1(char *rx_buffer, int msg_length)
+{
+	unsigned int cnt = 0; //Cnt bytes
+	for(cnt=0;cnt<msg_length;cnt++)
+	{
+		UCA1TXBUF = *(rx_buffer+cnt);
+		//Wait until each bit has been sent
+		while(!(UCTXIFG==(UCTXIFG & UCA1IFG))&&((UCA1STAT & UCBUSY)==UCBUSY));
+	}
+}
+
+extern void ___send_char_usci_A1(char rx)
+{
+	UCA1TXBUF = rx;
+	while(!(UCTXIFG==(UCTXIFG & UCA1IFG))&&((UCA1STAT & UCBUSY)==UCBUSY));
+}
+
+extern void ___setup_usci_A1(int baud_rate)
 {
 	// Configure USCI module
     UCA1CTL1 = UCSWRST;			// Keep module on reset state

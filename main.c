@@ -10,7 +10,8 @@
 
 //Libraries
 #include <msp430.h> //Common used library
-#include <useful_lib.h> //Useful functions
+#include "useful_lib.h" //Useful functions
+
 
 
 /*

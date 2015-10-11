@@ -19,13 +19,11 @@
 								<listOptionValue builtIn="false" value="DEVICE_CONFIGURATION_ID=MSP430F5529"/>
 								<listOptionValue builtIn="false" value="OUTPUT_FORMAT=ELF"/>
 								<listOptionValue builtIn="false" value="CCS_MBS_VERSION=5.5.0"/>
-								<listOptionValue builtIn="false" value="LINKER_COMMAND_FILE=lnk_msp430f5529.cmd"/>
 								<listOptionValue builtIn="false" value="RUNTIME_SUPPORT_LIBRARY=libc.a"/>
 								<listOptionValue builtIn="false" value="OUTPUT_TYPE=executable"/>
 							</option>
 							<option id="com.ti.ccstudio.buildDefinitions.core.OPT_CODEGEN_VERSION.172919913" superClass="com.ti.ccstudio.buildDefinitions.core.OPT_CODEGEN_VERSION" value="15.9.0" valueType="string"/>
 							<targetPlatform id="com.ti.ccstudio.buildDefinitions.MSP430_15.9.exe.targetPlatformDebug.1578210862" name="Platform" superClass="com.ti.ccstudio.buildDefinitions.MSP430_15.9.exe.targetPlatformDebug"/>
-							<builder buildPath="${BuildDirectory}" id="com.ti.ccstudio.buildDefinitions.MSP430_15.9.exe.builderDebug.905749210" name="GNU Make.Debug" superClass="com.ti.ccstudio.buildDefinitions.MSP430_15.9.exe.builderDebug"/>
 							<tool id="com.ti.ccstudio.buildDefinitions.MSP430_15.9.exe.compilerDebug.765429384" name="MSP430 Compiler" superClass="com.ti.ccstudio.buildDefinitions.MSP430_15.9.exe.compilerDebug">
 								<option id="com.ti.ccstudio.buildDefinitions.MSP430_15.9.compilerID.DEFINE.1358812866" superClass="com.ti.ccstudio.buildDefinitions.MSP430_15.9.compilerID.DEFINE" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="__MSP430F5529__"/>
