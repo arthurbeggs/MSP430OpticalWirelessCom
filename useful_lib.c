@@ -7,6 +7,7 @@
 
 #include "useful_lib.h"
 
+//Initialize the interruptions from USCI A1
 #ifdef ___INT_USCIA1
 	void* (*___int_uscia1)(void*);
 	void* ___int_uscia1arg;
@@ -16,6 +17,8 @@
 		(*___int_uscia1)(___int_uscia1arg);
 	}
 #endif
+
+
 
 extern void ___send_msg_usci_A1(char *rx_buffer, int msg_length)
 {
