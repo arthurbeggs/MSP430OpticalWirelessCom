@@ -1,0 +1,28 @@
+Galera terminei o esqueleto da main, lá vcs podem encontrar as funções que vamos precisar!
+
+Arthur - I2C
+
+1) A função de receber uma frase não aparece na main, pq ela é de interrupção!
+
+Ela deve guardar a frase na string declarada globalmente chamada frase.
+E deve também mudar a flag frase_recebida (tb global) para 1;
+
+2) void manda_frase(int pc_destino);
+
+Deve mandar a frase guardada na variável frase para a máquina de endereço maquina_destino.
+
+
+
+Jessé – UART
+
+1)  char status_inicial(void)
+
+Deve perguntar ao usuário se esta máquina é Master ou Slave. Deve retornar ‘M’ para Master e ‘S’ para Slave.
+
+2) int receber_pc(void)
+
+Deve perguntar 2 coisas ao usuário, a frase e envio e a máquina destino. Deve guardar a frase na string global “frase” e retornar o inteiro correspondente a máquina destino.
+
+3) void manda_frase_pc(void)
+
+Deve mandar para o usuário a frase guardada na string global “frase”.
