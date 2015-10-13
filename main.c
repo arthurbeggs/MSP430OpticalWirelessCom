@@ -71,7 +71,7 @@ int main(void) {
     		if(strcmp(frase, "mudar master"))//caso não seja o comendo de troca de mestre
 			{
 				morse(frase);//pisca a frase em código morse
-				manda_frase_pc(maquina_destino);//função que manda a frase via UART para o PC
+				manda_frase_pc();//função que manda a frase via UART para o PC
 			}
 			else { //caso seja o comando de troca de master
 				status = 'M'//muda seu status para Master
