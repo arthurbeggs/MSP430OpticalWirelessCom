@@ -67,6 +67,7 @@ int main(void) {
     	}
     	else if (status == 'S') {//caso esta maquina seja um Slave
     		while(!frase_recebida) {}//aguardar receber uma frase
+    		frase_recebida = 0;
     		if(strcmp(frase, "mudar master"))//caso não seja o comendo de troca de mestre
 			{
 				morse(frase);//pisca a frase em código morse
@@ -75,6 +76,7 @@ int main(void) {
 			else { //caso seja o comando de troca de master
 				status = 'M'//muda seu status para Master
 			}
+
     	}
     	else {
     		//variável de status indefinida tratar erro!!
