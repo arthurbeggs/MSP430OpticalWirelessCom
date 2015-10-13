@@ -30,7 +30,7 @@ int frase_recebida = 0;
 */
 int main(void) {
 	//variáveis locais
-	int pc_destino;
+	int maquina_destino;
 
     //SETUP
     WDTCTL = WDTPW | WDTHOLD;	// Stop watchdog timer
@@ -44,8 +44,8 @@ int main(void) {
     while(1) {
     	//caso esta maquina seja o master
     	if(status == 'M') {
-    		pc_destino = receber_pc();//função que pede e recebe uma frase do PC e guarda na variável global frase, e pedi o PC destino (número de 0 à 2) e retrna esse número
-    		if(pc_destino == MYID)//caso esteja mandando uma frase para se mesmo
+    		maquina_destino = receber_pc();//função que pede e recebe uma frase do PC e guarda na variável global frase, e pedi o PC destino (número de 0 à 2) e retrna esse número
+    		if(maquina_destino == MYID)//caso esteja mandando uma frase para se mesmo
     		{
     			if(strcmp(frase, "mudar master"))//caso não seja o comendo de troca de mestre
     			{
@@ -57,10 +57,10 @@ int main(void) {
     			if(strcmp(frase, "mudar master"))//caso não seja o comendo de troca de mestre
     			{
     				morse(frase);//pisca a frase em código morse
-    				manda_frase(pc_destino);//função que manda a frase via I2C para a maquina detino
+    				manda_frase(maquina_destino);//função que manda a frase via I2C para a maquina detino
     			}
     			else { //caso seja o comando de troca de master
-    				manda_frase(pc_destino); //manda a frase "mudar master" para o PC destino via I2C
+    				manda_frase(maquina_destino); //manda a frase "mudar master" para o PC destino via I2C
     				status = 'S'//muda seu status para Slave
     			}
     		}
@@ -70,7 +70,7 @@ int main(void) {
     		if(strcmp(frase, "mudar master"))//caso não seja o comendo de troca de mestre
 			{
 				morse(frase);//pisca a frase em código morse
-				manda_frase_pc(pc_destino);//função que manda a frase via UART para o PC
+				manda_frase_pc(maquina_destino);//função que manda a frase via UART para o PC
 			}
 			else { //caso seja o comando de troca de master
 				status = 'M'//muda seu status para Master
