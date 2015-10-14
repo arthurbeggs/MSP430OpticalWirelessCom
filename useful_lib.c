@@ -91,3 +91,62 @@ void ___delay_s(int delay)
 	TA0CTL &= ~(TAIFG); //Resets the controller after the interrupt flag
 	for(;!(TA0CTL & TAIFG););
 }
+
+extern void ___setup_usci_B0()
+{
+    UCB0CTL1 = UCSWRST;             // Keep module on reset state
+    UCB0CTL0 = UCMODE_3 | UCSYNC;   // I2C mode, 8-bit data, slave mode
+    UCB0CTL1 |= UCSSEL_2;           // BRCLK = SMCLK
+    UCB0BR1 = 0;
+    UCB0BR0 = 4;                    // Prescaler = 4
+    P3SEL |= BIT0 | BIT1;           // Configure I/O ports
+    UCB0I2COA = (uint8_t) MYID;               // Set own address using MYID defined in main.c
+    UCB0CTL1 &= ~UCSWRST;           // Release module for operation
+    UCB0IE |= UCRXIE;               // Enable RX interrupts
+}
+
+extern void ___switch_to_MASTER()
+{
+    UCB0CTL1 |= UCTR | UCSWRST; // Reset module and enable transmitter
+    UCB0CTL0 |= UCMST;      // Set as master
+    UCB0RXBUF = 0x0;        // Clear RX buffer
+    UCB0TXBUF = 0x0;        // Clear TX buffer
+    UCB0CTL1 &= ~UCSWRST;   // Release module
+    UCB0IE |= UCRXIE;       // Enable interrupts
+}
+
+extern void ___switch_to_SLAVE()
+{
+    UCB0CTL1 |= UCSWRST;    // Reset module
+    UCB0CTL0 &= ~UCMST;     // Set as slave
+    UCB0RXBUF = 0x0;        // Clear RX buffer
+    UCB0TXBUF = 0x0;        // Clear TX buffer
+    UCB0CTL1 &= ~UCTR & ~UCSWRST;   // Release module and disable transmitter
+    UCB0IE |= UCRXIE;       // Enable interrupts
+}
+
+extern void ___select_SLAVE(uint8_t address)
+{
+    UCB0I2CSA = address;
+}
+
+extern void ___stop_transmission()
+{
+    UCB0CTL1 |= UCTXSTP;
+}
+
+extern void ___send_byte(uint8_t txByte)
+{
+    UCB0CTL1 |= UCTR;               // Start transmitter
+    UCB0CTL1 |= UCTXSTT;            // Start condition
+    while(!(UCB0IFG & UCTXIFG)){}   // TX Buffer ready?
+    UCB0TXBUF = txByte;             // Send byte
+    while(!(UCB0IFG & UCTXIFG)){}   // TX Buffer ready?
+}
+
+extern void ___read_byte(char *rxBuffer)
+{
+    rx_byte_buff = (char) UCB0RXBUF;
+    UCB0RXBUF = 0x0;
+    strncat(rxBuffer, rx_byte_buff, 1);
+}

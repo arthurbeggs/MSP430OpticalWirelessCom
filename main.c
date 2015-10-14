@@ -21,6 +21,7 @@ char frase[300];//
 char status;	//variável para identificar se esta máquina é master ou slave
 			//'M' - para master
 			//'S' - para slave
+volatile unsigned char rx_buffer = 0;
 
 //flags
 int frase_recebida = 0;
@@ -86,4 +87,11 @@ int main(void) {
 
 
 	return 0;
+}
+
+
+#pragma vector=USCI_B0_VECTOR
+__interrupt void I2C_ISR(void)
+{
+    ___read_byte();
 }
