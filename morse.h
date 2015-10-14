@@ -18,4 +18,6 @@
 
 	void converte(char* pt, char* morse);//função que converte uma string de pt para morse
 
+	void pisca_morse(char* morse);//função para piscar uma frase em morse
+
 #endif
