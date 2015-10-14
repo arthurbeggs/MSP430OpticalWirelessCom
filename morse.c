@@ -41,11 +41,11 @@ void converte_pt_morse(char* pt, char* morse)
 
 	for(i=0; pt[i] != '\0'; i++)//for para percorrer a frase
     	{
-    		for(j=0; MatMorse[frase[i]][j] != '\0'; j++, k++)
+    		for(j=0; MatMorse[pt[i]][j] != '\0'; j++, k++)
     		{
-    			morse[k] = MatMorse[frase[i]][j];
+    			morse[k] = MatMorse[pt[i]][j];
     		}
- 	   		moser[k] = 'e';
+ 	   		morse[k] = 'e';
  	   		k++;
  	   	}
  	   	morse[k] = '\0';
@@ -59,7 +59,7 @@ void converte_morse_pt(char* pt, char* morse)
 	for(i=0, k=0; morse != '\0'; i++)
 	{
 		j = 0;
-		while(morse != 'e')
+		while(morse[j] != 'e')
 			letra[j++] = morse[i++];
 		letra[j] = '\0';
 
