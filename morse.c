@@ -56,10 +56,10 @@ void converte_morse_pt(char* pt, char* morse)
 	int i, j, k, achou;
 	char letra[10];
 
-	for(i=0, k=0; morse != '\0'; i++)
+	for(i=0, k=0; morse[i] != '\0'; i++)
 	{
 		j = 0;
-		while(morse[j] != 'e')
+		while(morse[i] != 'e')
 			letra[j++] = morse[i++];
 		letra[j] = '\0';
 
