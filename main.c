@@ -59,18 +59,19 @@ int main(void) {
     	//caso esta maquina seja o master
     	if(status == 'M') {
     		maquina_destino = receber_pc();//função que pede e recebe uma frase do PC e guarda na variável global frase, e pedi o PC destino (número de 0 à 2) e retrna esse número
-    		if(maquina_destino == MYID)//caso esteja mandando uma frase para se mesmo
+    		converte_pt_morse(frase_pt, frase_morse);
+            if(maquina_destino == MYID)//caso esteja mandando uma frase para se mesmo
     		{
     			if(strcmp(frase, "mudar master"))//caso não seja o comendo de troca de mestre
     			{
-    				morse(frase);//pisca a frase em código morse
+    				pisca_morse(frase_morse);//pisca a frase em código morse
     			}
     			//caso seja o comando de troca de master não fazer nada, pois esta maquina já é o master
     		}
     		else {//cado eseja mandando para uma outra máquina
     			if(strcmp(frase, "mudar master"))//caso não seja o comendo de troca de mestre
     			{
-    				morse(frase);//pisca a frase em código morse
+    				pisca_morse(frase);//pisca a frase em código morse
     				manda_frase(maquina_destino);//função que manda a frase via I2C para a maquina detino
     			}
     			else { //caso seja o comando de troca de master
@@ -82,9 +83,10 @@ int main(void) {
     	else if (status == 'S') {//caso esta maquina seja um Slave
     		while(!frase_recebida) {}//aguardar receber uma frase
     		frase_recebida = 0;
+            converte_morse_pt(frase_pt, frase_morse);
     		if(strcmp(frase, "mudar master"))//caso não seja o comendo de troca de mestre
 			{
-				morse(frase);//pisca a frase em código morse
+				pisca_morse(frase_morse);//pisca a frase em código morse
 				manda_frase_pc();//função que manda a frase via UART para o PC
 			}
 			else { //caso seja o comando de troca de master
