@@ -18,6 +18,12 @@
 	}
 #endif
 
+//função de inicialização
+void init(void)
+{
+	//Configurando as portas de saida
+	P1DIR |= BIT0;				// P1.0 = LED
+}
 
 
 extern void ___send_msg_usci_A1(char *rx_buffer, int msg_length)

@@ -11,6 +11,9 @@
 #include <msp430.h>
 #include <stdlib.h>
 
+//função de inicialização
+void init(void);
+
 //Sets Universal Serial Communication Interface (USCI) A1
 extern void ___setup_usci_A1(int baud_rate);
 
