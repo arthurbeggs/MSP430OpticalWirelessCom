@@ -41,6 +41,9 @@ int main(void) {
 	//Configure clock system
     ___setup_clk0(16000000);
 
+    //setando variáveis iniciais
+    init();
+
     status = status_inicial();//função que se comunica com o PC via UART pergunta o usuário se essa maquina será master ou slave, retorna 'M' para master ou 'S' para slave
 
     //LOOP
