@@ -2,10 +2,11 @@
  * morse.h
  *
  *  Created on: 14/10/2015
- *      Author: Arthur, Luan e Jesse
+ *      Author: Luan
  */
 
  #include "morse.h"
+ #include <string.h>
 
  void dot(void)
 {
@@ -34,7 +35,7 @@ void space(void)
 	return;
 }
 
-void converte(char* pt, char* morse)
+void converte_pt_morse(char* pt, char* morse)
 {
 	int i, j, k = 0;
 
@@ -48,6 +49,25 @@ void converte(char* pt, char* morse)
  	   		k++;
  	   	}
  	   	morse[k] = '\0';
+}
+
+void converte_morse_pt(char* pt, char* morse)
+{
+	int i, j, k, achou;
+	char letra[10];
+
+	for(i=0, k=0; morse != '\0'; i++)
+	{
+		j = 0;
+		while(morse != 'e')
+			letra[j++] = morse[i++];
+		letra[j] = '\0';
+
+		for(j=0, achou=0; (j<129) && (!achou); j++)
+			if(!strcmp(letra, MatMorse[j]))
+				pt[k++] = j;
+
+	}
 }
 
 void pisca_morse(char* morse){

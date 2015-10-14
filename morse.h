@@ -16,7 +16,8 @@
 	void dash(void);//função que pisca um traço
 	void space(void);//função que pisca um espaço
 
-	void converte(char* pt, char* morse);//função que converte uma string de pt para morse
+	void converte_pt_morse(char* pt, char* morse);//função que converte uma string de pt para morse
+	void converte_morse_pt(char* pt, char* morse);//função que converte uma string de pt para morse
 
 	void pisca_morse(char* morse);//função para piscar uma frase em morse
 
