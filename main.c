@@ -13,11 +13,14 @@
 //Libraries
 #include <msp430.h> //Common used library
 #include "useful_lib.h" //Useful functions
- //CHECAR SE EXISTE NO MSP!!!
+#include "morse.h"//morse function
+ 
+//CHECAR SE EXISTE NO MSP!!!
 #include <strlib.h>//funções para tratar strings
 
 //Variáveis globais
-char frase[300];//
+char frase_morse[1200];
+char frase_pt[300];
 char status;	//variável para identificar se esta máquina é master ou slave
 			//'M' - para master
 			//'S' - para slave
