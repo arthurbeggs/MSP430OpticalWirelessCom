@@ -10,13 +10,14 @@
 //identidade para diferenciar um PC do outro
 #define MYID 0
 
+//Initialize the interruptions from USCI A1
+#define ___INT_USCIA1
+
 //Libraries
 #include <msp430.h> //Common used library
 #include "useful_lib.h" //Useful functions
 #include "morse.h"//morse function
- 
-//CHECAR SE EXISTE NO MSP!!!
-#include <strlib.h>//funções para tratar strings
+#include <string.h>//funções para tratar strings
 
 //Variáveis globais
 char frase_morse[1200];
@@ -40,6 +41,13 @@ int main(void) {
 
 	//Configure clock system
     ___setup_clk0(16000000);
+
+    //Sets timerA0 using clock0
+	___setup_timerA0();
+
+	//Sets Universal Serial Communication Interface (USCI) A1
+	___setup_usci_A1(9600);
+
 
     //setando variáveis iniciais
     init();

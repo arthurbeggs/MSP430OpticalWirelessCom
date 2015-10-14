@@ -7,17 +7,6 @@
 
 #include "useful_lib.h"
 
-//Initialize the interruptions from USCI A1
-#ifdef ___INT_USCIA1
-	void* (*___int_uscia1)(void*);
-	void* ___int_uscia1arg;
-	#pragma vector=USCI_A1_VECTOR
-	__interrupt void UART_ISR(void)
-	{
-		(*___int_uscia1)(___int_uscia1arg);
-	}
-#endif
-
 //função de inicialização
 void init(void)
 {
@@ -34,6 +23,7 @@ extern void ___send_msg_usci_A1(char *rx_buffer, int msg_length)
 		UCA1TXBUF = *(rx_buffer+cnt);
 		//Wait until each bit has been sent
 		while(!(UCTXIFG==(UCTXIFG & UCA1IFG))&&((UCA1STAT & UCBUSY)==UCBUSY));
+		___delay_ms(1);
 	}
 }
 

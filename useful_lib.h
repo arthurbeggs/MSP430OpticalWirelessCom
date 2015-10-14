@@ -11,6 +11,17 @@
 #include <msp430.h>
 #include <stdlib.h>
 
+//Initialize the interruptions from USCI A1
+#ifdef ___INT_USCIA1
+	void* (*___int_uscia1)(void*);
+	void* ___int_uscia1arg;
+	#pragma vector=USCI_A1_VECTOR
+	__interrupt void UART_ISR(void)
+	{
+		(*___int_uscia1)(___int_uscia1arg);
+	}
+#endif
+
 //função de inicialização
 void init(void);
 
