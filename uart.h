@@ -10,7 +10,7 @@
 
 char status_inicial(void);
 
-int receber_pc();
+int receber_pc(char*);
 
 void manda_frase_pc(void)
 

@@ -19,7 +19,7 @@ Jessé – UART
 
 Deve perguntar ao usuário se esta máquina é Master ou Slave. Deve retornar ‘M’ para Master e ‘S’ para Slave.
 
-2) int receber_pc(void)
+2) int receber_pc(char* frase)
 
 Deve perguntar 2 coisas ao usuário, a frase e envio e a máquina destino. Deve guardar a frase na string global “frase” e retornar o inteiro correspondente a máquina destino.
 
