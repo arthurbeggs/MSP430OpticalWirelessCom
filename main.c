@@ -87,10 +87,10 @@ int main(void) {
     		while(!frase_recebida) {}//aguardar receber uma frase
     		frase_recebida = 0;
             converte_morse_pt(frase_pt, frase_morse);
-    		if(strcmp(frase_pt, "mudar master"))//caso não seja o comendo de troca de mestre
+    		if(strcmp(frase_pt, "mudar master"))//caso não seja o camando de troca de mestre
 			{
 				pisca_morse(frase_morse);//pisca a frase em código morse
-				manda_frase_pc();//função que manda a frase via UART para o PC
+				manda_frase_pc(frase_pt);//função que manda a frase via UART para o PC
 			}
 			else { //caso seja o comando de troca de master
                 ___switch_to_MASTER();
