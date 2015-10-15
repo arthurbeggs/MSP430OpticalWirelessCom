@@ -11,17 +11,6 @@
 #include <msp430.h>
 #include <stdlib.h>
 
-//Initialize the interruptions from USCI A1
-#ifdef ___INT_USCIA1
-	void* (*___int_uscia1)(void*);
-	void* ___int_uscia1arg;
-	#pragma vector=USCI_A1_VECTOR
-	__interrupt void UART_ISR(void)
-	{
-		(*___int_uscia1)(___int_uscia1arg);
-	}
-#endif
-
 //função de inicialização
 void init(void);
 
@@ -49,7 +38,8 @@ extern void ___send_msg_usci_A1(char *rx_buffer, int msg_length);
 //Communication function to send a char by usci A1 
 extern void ___send_char_usci_A1(char rx);
 
-
+//Receives a char from the PC
+extern void ___uscia1_receive_char_pc(char* char_pc);
 
 
 #endif /* USEFUL_LIB_H_ */
