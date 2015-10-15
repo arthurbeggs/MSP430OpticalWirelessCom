@@ -15,6 +15,13 @@ void init(void)
 }
 
 
+
+extern void ___receive_char_usci_A1(char *tx)
+{
+	while (!(UCRXIFG==(UCRXIFG & UCA1IFG)));
+	*tx = UCA1RXBUF;
+}
+
 extern void ___send_msg_usci_A1(char *rx_buffer, int msg_length)
 {
 	unsigned int cnt = 0; //Cnt bytes

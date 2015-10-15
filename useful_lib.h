@@ -10,6 +10,7 @@
 
 #include <msp430.h>
 #include <stdlib.h>
+
 #include <stdint.h>
 #include <string.h>
 
@@ -24,6 +25,7 @@
         else if (UCSTPIFG) {    }
     }
 #endif
+
 
 //função de inicialização
 void init(void);
@@ -52,6 +54,7 @@ extern void ___send_msg_usci_A1(char *rx_buffer, int msg_length);
 //Communication function to send a char by usci A1
 extern void ___send_char_usci_A1(char rx);
 
+
 //Sets the USCI (I2C) in B0
 extern void ___setup_usci_B0();
 
@@ -69,6 +72,10 @@ extern void ___stop_transmission();
 
 //Send byte
 extern void ___send_byte(uint8_t txByte);
+
+//Receives a char from the PC
+extern void ___uscia1_receive_char_pc(char* char_pc);
+
 
 //Receive byte
 extern void ___read_byte(char *rxBuffer);
