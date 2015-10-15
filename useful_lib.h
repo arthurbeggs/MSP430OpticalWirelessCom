@@ -13,8 +13,14 @@
 #include <stdint.h>
 #include <string.h>
 
+
 //Variables
- volatile unsigned char rx_byte_buff = 0;
+ volatile unsigned char rx_byte_buff;
+
+//identidade para diferenciar um PC do outro
+#define MYID 0
+
+int frase_recebida;
 
 #ifdef ___INT_USCIB0
 #pragma vector=USCI_B0_VECTOR
@@ -24,12 +30,6 @@
         if (UCSTPIFG) {  frase_recebida = 1  }
     }
 #endif
-
-//identidade para diferenciar um PC do outro
-#define MYID 0
-
-//flags
-int frase_recebida = 0;
 
 //função de inicialização
 void init(void);

@@ -149,6 +149,7 @@ extern void ___send_byte(uint8_t txByte)
 
 extern void ___read_byte(char *rxBuffer)
 {
+    rx_byte_buff = 0;
     rx_byte_buff = (char) UCB0RXBUF;
     UCB0RXBUF = 0x0;
     strncat(rxBuffer, rx_byte_buff, 1);

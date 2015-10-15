@@ -14,6 +14,12 @@
 #include <string.h>//funções para tratar strings
 #include "uart.h"
 
+#define ___INT_USCIB0
+
+extern int frase_recebida;
+extern char* MatMorse[];
+extern volatile unsigned char rx_byte_buff;
+
 //Variáveis globais
 volatile char frase_morse[1200];
 volatile char frase_pt[300];
@@ -22,17 +28,27 @@ volatile char status;	//variável para identificar se esta máquina é master ou
 			//'S' - para slave
 volatile unsigned char rx_buffer = 0;
 
+
+
 void manda_frase(uint8_t address);
 
 /*
  * main.c
 */
 int main(void) {
+    WDTCTL = WDTPW | WDTHOLD;   // Stop watchdog timer
+
+
+
 	//variáveis locais
 	volatile int maquina_destino;
 
+    frase_recebida = 0;
+
+    char* MatMorse[] = {"","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","e","","","","","","","","","","","","","","","","ttttt","ptttt","ppttt","ppptt","ppppt","ppppp","tpppp","ttppp","tttpp","ttttp","","","","","","","","pt","tppp","tptp","tpp","p","pptp","ttp","pppp","pp","pttt","tpt","ptpp","tt","tp","ttt","pttp","ttpt","ptp","ppp","t","ppt","pppt","ptt","tppt","tptt","ttpp","","","","","","","pt","tppp","tptp","tpp","p","pptp","ttp","pppp","pp","pttt","tpt","ptpp","tt","tp","ttt","pttp","ttpt","ptp","ppp","t","ppt","pppt","ptt","tppt","tptt","ttpp","","","","","",""};
+
     //SETUP
-    WDTCTL = WDTPW | WDTHOLD;	// Stop watchdog timer
+
 
 	//Configure clock system
     ___setup_clk0(16000000);

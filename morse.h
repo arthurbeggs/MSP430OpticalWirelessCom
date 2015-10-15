@@ -9,8 +9,8 @@
 #define MORSE_LIB_H_
 
  	//Matriz do caractere em binário onde o indice é o numero do caractere em ascii
-	char* MatMorse[] = {"","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","e","","","","","","","","","","","","","","","","ttttt","ptttt","ppttt","ppptt","ppppt","ppppp","tpppp","ttppp","tttpp","ttttp","","","","","","","","pt","tppp","tptp","tpp","p","pptp","ttp","pppp","pp","pttt","tpt","ptpp","tt","tp","ttt","pttp","ttpt","ptp","ppp","t","ppt","pppt","ptt","tppt","tptt","ttpp","","","","","","","pt","tppp","tptp","tpp","p","pptp","ttp","pppp","pp","pttt","tpt","ptpp","tt","tp","ttt","pttp","ttpt","ptp","ppp","t","ppt","pppt","ptt","tppt","tptt","ttpp","","","","","",""};
 
+    char* MatMorse[];
 
 	void dot(void);//função que pisca um ponto
 	void dash(void);//função que pisca um traço
