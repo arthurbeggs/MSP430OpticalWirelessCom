@@ -14,10 +14,7 @@
 #include <string.h>//funções para tratar strings
 #include "uart.h"
 
-#define ___INT_USCIB0
-
 extern int frase_recebida;
-extern char* MatMorse[];
 extern volatile unsigned char rx_byte_buff;
 
 //Variáveis globais
@@ -44,8 +41,6 @@ int main(void) {
 	volatile int maquina_destino;
 
     frase_recebida = 0;
-
-    char* MatMorse[] = {"","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","e","","","","","","","","","","","","","","","","ttttt","ptttt","ppttt","ppptt","ppppt","ppppp","tpppp","ttppp","tttpp","ttttp","","","","","","","","pt","tppp","tptp","tpp","p","pptp","ttp","pppp","pp","pttt","tpt","ptpp","tt","tp","ttt","pttp","ttpt","ptp","ppp","t","ppt","pppt","ptt","tppt","tptt","ttpp","","","","","","","pt","tppp","tptp","tpp","p","pptp","ttp","pppp","pp","pttt","tpt","ptpp","tt","tp","ttt","pttp","ttpt","ptp","ppp","t","ppt","pppt","ptt","tppt","tptt","ttpp","","","","","",""};
 
     //SETUP
 
@@ -75,6 +70,10 @@ int main(void) {
     	{
     		maquina_destino = receber_pc(frase_pt);//função que pede e recebe uma frase do PC e guarda na variável global frase, e pedi o PC destino (número de 0 à 2) e retrna esse número
     		converte_pt_morse(frase_pt, frase_morse);
+    		___send_char_usci_A1(10);
+    		___send_char_usci_A1(13);
+    		___send_msg_usci_A1("MORSE: ", 7);
+    		___send_msg_usci_A1(frase_morse, strlen(frase_morse));
             if(maquina_destino == MYID)//caso esteja mandando uma frase para se mesmo
     		{
     			if(strcmp(frase_pt, "mudar master"))//caso não seja o comendo de troca de mestre

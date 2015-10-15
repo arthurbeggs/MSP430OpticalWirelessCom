@@ -10,7 +10,6 @@
 
  	//Matriz do caractere em binário onde o indice é o numero do caractere em ascii
 
-    char* MatMorse[];
 
 	void dot(void);//função que pisca um ponto
 	void dash(void);//função que pisca um traço
