@@ -11,7 +11,7 @@
 #include <msp430.h>
 #include <stdlib.h>
 #include <stdint.h>
-#include <string.h>
+#include <intrinsics.h>
 
 
 //Variables
@@ -66,6 +66,9 @@ extern void ___select_SLAVE(uint8_t address);
 
 //Stop transmission
 extern void ___stop_transmission();
+
+//Start transmission
+extern void ___start_transmission();
 
 //Send byte
 extern void ___send_byte(uint8_t txByte);

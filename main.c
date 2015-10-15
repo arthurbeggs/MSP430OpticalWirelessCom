@@ -135,16 +135,18 @@ void manda_frase(uint8_t address)
     volatile int dummy;
     volatile int len = strlen(frase_morse);
     ___select_SLAVE(address);                           //Sets SLAVE address
+    ___start_transmission();
     for (dummy = 0 ; dummy < len ; dummy++)
     {
         ___send_byte((uint8_t) frase_morse[dummy]);     //Send individual bytes
     }
+    ___stop_transmission();
 }
 
 #pragma vector=USCI_B0_VECTOR
     __interrupt void I2C_ISR(void)
     {
-        if (UCB0IFG & UCRXIFG) {___read_byte(frase_morse); }
+         ___read_byte(frase_morse);
         if (UCB0IFG & UCSTPIFG) {  frase_recebida = 1;  }
     }
 
