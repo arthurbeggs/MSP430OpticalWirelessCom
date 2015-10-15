@@ -25,6 +25,9 @@
     }
 #endif
 
+//identidade para diferenciar um PC do outro
+#define MYID 0
+
 //flags
 int frase_recebida = 0;
 

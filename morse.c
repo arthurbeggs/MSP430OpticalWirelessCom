@@ -6,6 +6,7 @@
  */
 
  #include "morse.h"
+ #include <msp430.h>
  #include <string.h>
 
  void dot(void)
@@ -75,11 +76,11 @@ void pisca_morse(char* morse){
 
 	for(i = 0; morse[i] != '\0'; i++)
 		{
-			if(letra[i] == 'p')
+			if(morse[i] == 'p')
 				dot();
-			else if (letra[i] == 't')
+			else if (morse[i] == 't')
 				dash();
-			else if(letra[i] == 'e')
+			else if(morse[i] == 'e')
 				space();
 		}
 }

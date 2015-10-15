@@ -11,7 +11,7 @@
 void manda_frase_pc(char* msg2pc)
 {
 	int l = strlen(msg2pc);
-	___send_msg_usci_A1(msg2pc, int l);
+	___send_msg_usci_A1(msg2pc, l);
 	___delay_ms(3);
 	___send_char_usci_A1(10);
 	___delay_ms(3);

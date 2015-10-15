@@ -7,15 +7,12 @@
  * Data: 14/09/2015
  */
 
-//identidade para diferenciar um PC do outro
-#define MYID 0
-
 //Libraries
 #include <msp430.h> //Common used library
 #include "useful_lib.h" //Useful functions
 #include "morse.h"//morse function
 #include <string.h>//funções para tratar strings
-#include <uart.h>
+#include "uart.h"
 
 //Variáveis globais
 volatile char frase_morse[1200];
