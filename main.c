@@ -52,6 +52,9 @@ int main(void) {
 
     status = status_inicial();//função que se comunica com o PC via UART pergunta o usuário se essa maquina será master ou slave, retorna 'M' para master ou 'S' para slave
 
+    if (status == 'M'){  ___switch_to_MASTER();  }
+    else {  ___switch_to_SLAVE();  }
+
     //LOOP
     while(1) {
     	//caso esta maquina seja o master
@@ -75,6 +78,7 @@ int main(void) {
     			}
     			else { //caso seja o comando de troca de master
     				manda_frase(maquina_destino); //manda a frase "mudar master" para o PC destino via I2C
+                    ___switch_to_SLAVE();
     				status = 'S';//muda seu status para Slave
     			}
     		}
@@ -89,6 +93,7 @@ int main(void) {
 				manda_frase_pc();//função que manda a frase via UART para o PC
 			}
 			else { //caso seja o comando de troca de master
+                ___switch_to_MASTER();
 				status = 'M';//muda seu status para Master
 			}
 
