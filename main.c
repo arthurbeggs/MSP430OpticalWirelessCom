@@ -23,22 +23,21 @@
 #include <string.h>//funções para tratar strings
 
 //Variáveis globais
-char frase_morse[1200];
-char frase_pt[300];
-char status;	//variável para identificar se esta máquina é master ou slave
+volatile char frase_morse[1200];
+volatile char frase_pt[300];
+volatile char status;	//variável para identificar se esta máquina é master ou slave
 			//'M' - para master
 			//'S' - para slave
 volatile unsigned char rx_buffer = 0;
 
-//flags
-int frase_recebida = 0;
+void manda_frase(uint8_t address);
 
 /*
  * main.c
 */
 int main(void) {
 	//variáveis locais
-	int maquina_destino;
+	volatile int maquina_destino;
 
     //SETUP
     WDTCTL = WDTPW | WDTHOLD;	// Stop watchdog timer
@@ -107,3 +106,17 @@ int main(void) {
 
 	return 0;
 }
+
+
+
+void manda_frase(uint8_t address)
+{
+    volatile int dummy;
+    volatile int len = strlen(frase_morse);
+    ___select_SLAVE(address);                           //Sets SLAVE address
+    for (dummy = 0 ; dummy < len ; dummy++)
+    {
+        ___send_byte((uint8_t) frase_morse[dummy]);     //Send individual bytes
+    }
+}
+

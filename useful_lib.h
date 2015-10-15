@@ -10,7 +10,6 @@
 
 #include <msp430.h>
 #include <stdlib.h>
-
 #include <stdint.h>
 #include <string.h>
 
@@ -22,10 +21,12 @@
     __interrupt void I2C_ISR(void)
     {
         if (UCRXIFG) {___read_byte(frase_morse); }
-        if (UCSTPIFG) {    }
+        if (UCSTPIFG) {  frase_recebida = 1  }
     }
 #endif
 
+//flags
+int frase_recebida = 0;
 
 //função de inicialização
 void init(void);
@@ -75,7 +76,6 @@ extern void ___send_byte(uint8_t txByte);
 
 //Receives a char from the PC
 extern void ___uscia1_receive_char_pc(char* char_pc);
-
 
 //Receive byte
 extern void ___read_byte(char *rxBuffer);
