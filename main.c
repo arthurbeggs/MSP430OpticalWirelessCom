@@ -60,7 +60,8 @@ int main(void) {
     //LOOP
     while(1) {
     	//caso esta maquina seja o master
-    	if(status == 'M') {
+    	if(status == 'M')
+    	{
     		maquina_destino = receber_pc(frase_pt);//função que pede e recebe uma frase do PC e guarda na variável global frase, e pedi o PC destino (número de 0 à 2) e retrna esse número
     		converte_pt_morse(frase_pt, frase_morse);
             if(maquina_destino == MYID)//caso esteja mandando uma frase para se mesmo
