@@ -142,7 +142,7 @@ extern void ___stop_transmission()
 
 extern void ___start_transmission()
 {
-    P4OUT ^= BIT7;                  // Flag de depuração
+
     UCB0CTL1 |= UCTR;               // Start transmitter
     UCB0CTL1 |= UCTXSTT;            // Start condition
 
@@ -152,7 +152,11 @@ extern void ___start_transmission()
 
 extern void ___send_byte(uint8_t txByte)
 {
+
     _no_operation();
+
+    P4OUT ^= BIT7;                  // Flag de depuração
+
     while(!(UCB0IFG & UCTXIFG)){}   // TX Buffer ready?
     UCB0TXBUF = txByte;             // Send byte
     // while(!(UCB0IFG & UCTXIFG)){}   // TX Buffer ready?

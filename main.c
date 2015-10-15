@@ -34,7 +34,7 @@ void manda_frase(uint8_t address);
 */
 int main(void) {
     WDTCTL = WDTPW | WDTHOLD;   // Stop watchdog timer
-
+    __disable_interrupt():
 
 
 	//variáveis locais
@@ -65,6 +65,10 @@ int main(void) {
 
     if (status == 'M'){  ___switch_to_MASTER();  }
     else {  ___switch_to_SLAVE();  }
+
+
+
+    __enable_interrupt();
 
     //LOOP
     while(1) {
