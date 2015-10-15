@@ -18,18 +18,11 @@
  volatile unsigned char rx_byte_buff;
 
 //identidade para diferenciar um PC do outro
-#define MYID 0
+#define MYID 0x2
+
 
 int frase_recebida;
 
-#ifdef ___INT_USCIB0
-#pragma vector=USCI_B0_VECTOR
-    __interrupt void I2C_ISR(void)
-    {
-        if (UCRXIFG) {___read_byte(frase_morse); }
-        if (UCSTPIFG) {  frase_recebida = 1  }
-    }
-#endif
 
 //função de inicialização
 void init(void);

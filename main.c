@@ -133,3 +133,10 @@ void manda_frase(uint8_t address)
     }
 }
 
+#pragma vector=USCI_B0_VECTOR
+    __interrupt void I2C_ISR(void)
+    {
+        if (UCRXIFG) {___read_byte(frase_morse); }
+        if (UCSTPIFG) {  frase_recebida = 1;  }
+    }
+

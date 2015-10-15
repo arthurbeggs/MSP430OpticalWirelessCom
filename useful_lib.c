@@ -130,7 +130,7 @@ extern void ___switch_to_SLAVE()
 
 extern void ___select_SLAVE(uint8_t address)
 {
-    UCB0I2CSA = address;
+    UCB0I2CSA = (uint8_t) address;
 }
 
 extern void ___stop_transmission()
