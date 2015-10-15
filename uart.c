@@ -8,44 +8,31 @@
 
 #include"uart.h"
 
-void manda_frase_pc(char* msg2pc)
+char status_inicial(void)
 {
-	int l = strlen(msg2pc);
-	___send_msg_usci_A1(msg2pc, l);
+	char ini_state;
+	char *ini_msg = "PRESSIONE M(MASTER) ou S(SLAVE): "; int msg_len = 33;
+	___send_msg_usci_A1(ini_msg, msg_len);
+
+	for(;;)
+	{
+		___receive_char_usci_A1(&ini_state);
+		if(ini_state == 'm' || ini_state == 's')
+		{
+			ini_state = (ini_state=='m' ? 'M' : 'S');
+			break;
+		}
+		else
+			continue;
+	}
+	___delay_ms(3);
+	___send_char_usci_A1(ini_state);
 	___delay_ms(3);
 	___send_char_usci_A1(10);
 	___delay_ms(3);
 	___send_char_usci_A1(13);
 	___delay_ms(3);
-}
-
-
-char status_inicial(void)
-{
-	char ini_state;
-	char *ini_msg = "PRESSIONE M(MASTER) ou S(SLAVE): "; int msg_len = 40;
-		___send_msg_usci_A1(ini_msg, msg_len);
-
-		for(;;)
-		{
-			___receive_char_usci_A1(&ini_state);
-			if(ini_state == 'm' || ini_state == 's')
-			{
-				ini_state = (ini_state=='m' ? 'M' : 'S');
-				break;
-			}
-			else
-				continue;
-		}
-		___delay_ms(3);
-		___send_char_usci_A1(ini_state);
-		___delay_ms(3);
-		___send_char_usci_A1('\n');
-		___delay_ms(3);
-		___send_char_usci_A1('\r');
-		___delay_ms(3);
-
-		return ini_state;
+	return ini_state;
 }
 
 int receber_pc(char* msg_pc)
@@ -88,4 +75,15 @@ int receber_pc(char* msg_pc)
 	}
 
 	return maquina_destino;
+}
+
+void manda_frase_pc(char* msg2pc)
+{
+	int l = strlen(msg2pc);
+	___send_msg_usci_A1(msg2pc, l);
+	___delay_ms(3);
+	___send_char_usci_A1(10);
+	___delay_ms(3);
+	___send_char_usci_A1(13);
+	___delay_ms(3);
 }
