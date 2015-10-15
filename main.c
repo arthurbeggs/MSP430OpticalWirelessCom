@@ -87,6 +87,7 @@ int main(void) {
     			{
     				pisca_morse(frase_morse);//pisca a frase em código morse
     				manda_frase(maquina_destino);//função que manda a frase via I2C para a maquina detino
+    				P4OUT &= ~BIT7;
     			}
     			else { //caso seja o comando de troca de master
     				manda_frase(maquina_destino); //manda a frase "mudar master" para o PC destino via I2C
@@ -98,7 +99,14 @@ int main(void) {
     	else if (status == 'S') {//caso esta maquina seja um Slave
     		while(!frase_recebida) {}//aguardar receber uma frase
     		frase_recebida = 0;
+    		P4OUT &= ~BIT7;
+			___send_msg_usci_A1("MORSE: ", 7);
+			___send_msg_usci_A1(frase_morse, strlen(frase_morse));
+			___send_char_usci_A1(10);
+			___send_char_usci_A1(13);
             converte_morse_pt(frase_pt, frase_morse);
+            ___send_msg_usci_A1("FRASE: ", strlen(frase_pt));
+            ___send_msg_usci_A1(frase_pt, strlen(frase_pt));
     		if(strcmp(frase_pt, "mudar master"))//caso não seja o camando de troca de mestre
 			{
 				pisca_morse(frase_morse);//pisca a frase em código morse

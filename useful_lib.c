@@ -12,6 +12,8 @@ void init(void)
 {
 	//Configurando as portas de saida
 	P1DIR |= BIT0;				// P1.0 = LED
+	P4DIR |= BIT7;				// P4.7 = LED VERDE DE COMMUNICACAO
+	P4OUT &= ~BIT7;
 }
 
 
@@ -140,6 +142,7 @@ extern void ___stop_transmission()
 
 extern void ___send_byte(uint8_t txByte)
 {
+	P4OUT ^= BIT7;
     UCB0CTL1 |= UCTR;               // Start transmitter
     UCB0CTL1 |= UCTXSTT;            // Start condition
     while(!(UCB0IFG & UCTXIFG)){}   // TX Buffer ready?
@@ -149,6 +152,7 @@ extern void ___send_byte(uint8_t txByte)
 
 extern void ___read_byte(char *rxBuffer)
 {
+	P4OUT ^= BIT7;
     rx_byte_buff = 0;
     rx_byte_buff = (char) UCB0RXBUF;
     UCB0RXBUF = 0x0;
