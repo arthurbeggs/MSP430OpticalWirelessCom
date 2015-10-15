@@ -14,7 +14,7 @@ char status_inicial(void);
 //Pergunta ao usuário a frase de envio e a máquina destino.
 int receber_pc(char*);
 
-
-void manda_frase_pc(void)
+//Mandar para o usuário uma frase
+void manda_frase_pc(char*);
 
 #endif /* UART_H_ */

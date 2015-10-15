@@ -8,6 +8,13 @@
 
 #include"uart.h"
 
+void manda_frase_pc(char* msg2pc)
+{
+	int l = strlen(msg2pc);
+	___send_msg_usci_A1(msg2pc, int l);
+}
+
+
 char status_inicial(void)
 {
 	char ini_state;
