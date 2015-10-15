@@ -22,7 +22,7 @@
     __interrupt void I2C_ISR(void)
     {
         if (UCRXIFG) {___read_byte(frase_morse); }
-        else if (UCSTPIFG) {    }
+        if (UCSTPIFG) {    }
     }
 #endif
 
