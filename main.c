@@ -7,20 +7,15 @@
  * Data: 14/09/2015
  */
 
-//*********************************************************
-//********************PERDI!!!*****************************
-//*********************************************************
 //identidade para diferenciar um PC do outro
 #define MYID 0
-
-//Initialize the interruptions from USCI A1
-#define ___INT_USCIA1
 
 //Libraries
 #include <msp430.h> //Common used library
 #include "useful_lib.h" //Useful functions
 #include "morse.h"//morse function
 #include <string.h>//funções para tratar strings
+#include <uart.h>
 
 //Variáveis globais
 volatile char frase_morse[1200];
@@ -72,8 +67,8 @@ int main(void) {
     			}
     			//caso seja o comando de troca de master não fazer nada, pois esta maquina já é o master
     		}
-    		else {//cado eseja mandando para uma outra máquina
-    			if(strcmp(frase_pt, "mudar master"))//caso não seja o comendo de troca de mestre
+    		else {//caso esteja mandando para uma outra máquina
+    			if(strcmp(frase_pt, "mudar master"))//caso não seja o comando de troca de mestre
     			{
     				pisca_morse(frase_morse);//pisca a frase em código morse
     				manda_frase(maquina_destino);//função que manda a frase via I2C para a maquina detino
