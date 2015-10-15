@@ -54,6 +54,9 @@ int main(void) {
 	//Sets Universal Serial Communication Interface (USCI) A1
 	___setup_usci_A1(9600);
 
+    //Sets Universal Serial Communication Interface (USCI) B0
+    ___setup_usci_B0();
+
 
     //setando variáveis iniciais
     init();
@@ -144,9 +147,9 @@ void manda_frase(uint8_t address)
 }
 
 #pragma vector=USCI_B0_VECTOR
-    __interrupt void I2C_ISR(void)
+__interrupt void I2C_ISR(void)
     {
          ___read_byte(frase_morse);
-        if (UCB0IFG & UCSTPIFG) {  frase_recebida = 1;  }
+        // if (UCB0IFG & UCSTPIFG) {  frase_recebida = 1;  }
     }
 

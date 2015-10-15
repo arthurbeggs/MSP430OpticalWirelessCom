@@ -57,7 +57,7 @@ int receber_pc(char* msg_pc)
 	___send_char_usci_A1(13);
 	___delay_ms(3);
 
-	maquina_destino = c-'0';
+	maquina_destino = (uint8_t) c-'0';
 
 
 	char *ini_msg = "DIGITE A MENSAGEM A SER ENVIADA: "; msg_len = 33;

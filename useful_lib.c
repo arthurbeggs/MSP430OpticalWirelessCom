@@ -107,7 +107,7 @@ extern void ___setup_usci_B0()
     P3SEL |= BIT0 | BIT1;           // Configure I/O ports
     UCB0I2COA = (uint8_t) MYID;     // Set own address using MYID defined in main.c
     UCB0CTL1 &= ~UCSWRST;           // Release module for operation
-    UCB0IE |= UCSTPIE | UCRXIE;     // Enable STOP and RX interrupts
+    UCB0IE |= UCRXIE;     // Enable RX interrupts
 }
 
 extern void ___switch_to_MASTER()
@@ -127,7 +127,7 @@ extern void ___switch_to_SLAVE()
     UCB0RXBUF = 0x0;        // Clear RX buffer
     UCB0TXBUF = 0x0;        // Clear TX buffer
     UCB0CTL1 &= ~UCTR & ~UCSWRST;   // Release module and disable transmitter
-    UCB0IE |= UCSTPIE | UCRXIE;       // Enable interrupts
+    UCB0IE |= UCRXIE;       // Enable interrupts
 }
 
 extern void ___select_SLAVE(uint8_t address)
@@ -152,9 +152,10 @@ extern void ___start_transmission()
 
 extern void ___send_byte(uint8_t txByte)
 {
+    _no_operation();
     while(!(UCB0IFG & UCTXIFG)){}   // TX Buffer ready?
     UCB0TXBUF = txByte;             // Send byte
-    while(!(UCB0IFG & UCTXIFG)){}   // TX Buffer ready?
+    // while(!(UCB0IFG & UCTXIFG)){}   // TX Buffer ready?
 
     __delay_cycles(1000);
     __no_operation();
@@ -163,7 +164,6 @@ extern void ___send_byte(uint8_t txByte)
 extern void ___read_byte(char *rxBuffer)
 {
 	P4OUT ^= BIT7;
-    rx_byte_buff = 0;
     rx_byte_buff = (char) UCB0RXBUF;
     UCB0RXBUF = 0x0;
     strncat(rxBuffer, rx_byte_buff, 1);

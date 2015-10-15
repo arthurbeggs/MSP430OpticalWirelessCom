@@ -8,6 +8,8 @@
 #ifndef UART_H_
 #define UART_H_
 
+#include <stdint.h>
+
 //Pergunta ao usuário se esta máquina é Master ou Slave. Retorna ‘M’ para Master e ‘S’ para Slave.
 char status_inicial(void);
 
