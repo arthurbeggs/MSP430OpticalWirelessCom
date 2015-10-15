@@ -96,9 +96,9 @@ extern void ___setup_usci_B0()
     UCB0BR1 = 0;
     UCB0BR0 = 4;                    // Prescaler = 4
     P3SEL |= BIT0 | BIT1;           // Configure I/O ports
-    UCB0I2COA = (uint8_t) MYID;               // Set own address using MYID defined in main.c
+    UCB0I2COA = (uint8_t) MYID;     // Set own address using MYID defined in main.c
     UCB0CTL1 &= ~UCSWRST;           // Release module for operation
-    UCB0IE |= UCRXIE;               // Enable RX interrupts
+    UCB0IE |= UCSTPIE | UCRXIE;     // Enable STOP and RX interrupts
 }
 
 extern void ___switch_to_MASTER()
@@ -118,7 +118,7 @@ extern void ___switch_to_SLAVE()
     UCB0RXBUF = 0x0;        // Clear RX buffer
     UCB0TXBUF = 0x0;        // Clear TX buffer
     UCB0CTL1 &= ~UCTR & ~UCSWRST;   // Release module and disable transmitter
-    UCB0IE |= UCRXIE;       // Enable interrupts
+    UCB0IE |= UCSTPIE | UCRXIE;       // Enable interrupts
 }
 
 extern void ___select_SLAVE(uint8_t address)

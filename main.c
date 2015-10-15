@@ -63,7 +63,7 @@ int main(void) {
     		converte_pt_morse(frase_pt, frase_morse);
             if(maquina_destino == MYID)//caso esteja mandando uma frase para se mesmo
     		{
-    			if(strcmp(frase, "mudar master"))//caso não seja o comendo de troca de mestre
+    			if(strcmp(frase_pt, "mudar master"))//caso não seja o comendo de troca de mestre
     			{
     				pisca_morse(frase_morse);//pisca a frase em código morse
     			}
@@ -103,11 +103,4 @@ int main(void) {
 
 
 	return 0;
-}
-
-
-#pragma vector=USCI_B0_VECTOR
-__interrupt void I2C_ISR(void)
-{
-    ___read_byte();
 }

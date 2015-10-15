@@ -16,16 +16,13 @@
 //Variables
  volatile unsigned char rx_byte_buff = 0;
 
-
-//Initialize the interruptions from USCI A1
-#ifdef ___INT_USCIA1
-	void* (*___int_uscia1)(void*);
-	void* ___int_uscia1arg;
-	#pragma vector=USCI_A1_VECTOR
-	__interrupt void UART_ISR(void)
-	{
-		(*___int_uscia1)(___int_uscia1arg);
-	}
+#ifdef ___INT_USCIB0
+#pragma vector=USCI_B0_VECTOR
+    __interrupt void I2C_ISR(void)
+    {
+        if (UCRXIFG) {___read_byte(frase_morse); }
+        else if (UCSTPIFG) {    }
+    }
 #endif
 
 //função de inicialização

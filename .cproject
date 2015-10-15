@@ -85,11 +85,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-<<<<<<< HEAD
-						<entry excluding="entrada_bit_LDR.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
-=======
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
->>>>>>> origin/master
 					</sourceEntries>
 				</configuration>
 			</storageModule>
