@@ -107,7 +107,7 @@ extern void ___setup_usci_B0()
     UCB0BR0 = 12;                   // Prescaler = 4
     UCB0I2COA = (uint8_t) MYID;     // Set own address using MYID defined in main.c
     UCB0CTL1 &= ~UCSWRST;           // Release module for operation
-    UCB0IE |= UCRXIE + UCSTTIE + UCSTPIE;     // Enable interrupts
+    UCB0IE |= UCRXIE + UCTXIE + UCSTTIE + UCSTPIE;     // Enable interrupts
 }
 
 extern void ___switch_to_MASTER()
