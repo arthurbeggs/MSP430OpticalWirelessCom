@@ -36,6 +36,7 @@
 
 # Code Composer Studio
 /Debug
+/Debug__GNU
 /Debug__GNU__TI
 .launches/
 .cproject

@@ -13,16 +13,18 @@
 #include <stdint.h>
 #include <intrinsics.h>
 
+//identidade para diferenciar um PC do outro
+#define MYID 0x0
+
 
 //Variables
- volatile unsigned char rx_byte_buff;
+unsigned char *TXDataPtr;
+unsigned char TXDataSize;
 
-//identidade para diferenciar um PC do outro
-#define MYID 0x1
+unsigned char *RXDataPtr;
+unsigned char RXDataSize;
 
-
-int frase_recebida;
-
+int frase_recebida;                         //DEPRECATED
 
 //função de inicialização
 void init(void);
@@ -71,12 +73,12 @@ extern void ___stop_transmission();
 extern void ___start_transmission();
 
 //Send byte
-extern void ___send_byte(uint8_t txByte);
+extern void ___send_message(unsigned char *TXData, uint8_t address);
 
 //Receives a char from the PC
 extern void ___uscia1_receive_char_pc(char* char_pc);
 
 //Receive byte
-extern void ___read_byte(char *rxBuffer);
+extern void ___read_message(char *RXBuffer);
 
 #endif /* USEFUL_LIB_H_ */

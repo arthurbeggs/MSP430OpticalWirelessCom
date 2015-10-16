@@ -107,12 +107,12 @@ extern void ___setup_usci_B0()
     UCB0BR0 = 12;                   // Prescaler = 4
     UCB0I2COA = (uint8_t) MYID;     // Set own address using MYID defined in main.c
     UCB0CTL1 &= ~UCSWRST;           // Release module for operation
-    UCB0IE |= UCRXIE + UCTXIE + UCSTTIE + UCSTPIE;     // Enable interrupts
+    UCB0IE |= UCRXIE + UCTXIE;      // Enable RX and TX interrupts
 }
 
 extern void ___switch_to_MASTER()
 {
-    UCB0CTL1 |= UCTR | UCSWRST; // Reset module and enable transmitter
+    UCB0CTL1 |= UCSWRST;    // Reset module and enable transmitter
     UCB0CTL0 |= UCMST;      // Set as master
     UCB0RXBUF = 0x0;        // Clear RX buffer
     UCB0TXBUF = 0x0;        // Clear TX buffer
@@ -126,7 +126,7 @@ extern void ___switch_to_SLAVE()
     UCB0CTL0 &= ~UCMST;     // Set as slave
     UCB0RXBUF = 0x0;        // Clear RX buffer
     UCB0TXBUF = 0x0;        // Clear TX buffer
-    UCB0CTL1 &= ~UCTR & ~UCSWRST;   // Release module and disable transmitter
+    UCB0CTL1 &= ~UCSWRST;   // Release module and disable transmitter
     UCB0IE |= UCRXIE + UCSTTIE + UCSTPIE;       // Enable interrupts
 }
 
@@ -146,15 +146,26 @@ extern void ___start_transmission()
     UCB0CTL1 |= UCTR + UCTXSTT;     // Start transmitter and start condition
 }
 
-extern void ___send_byte(uint8_t txByte)
+extern void ___send_message(unsigned char *TXData, uint8_t address)
 {
-    UCB0TXBUF = txByte;             // Send byte
+    ___delay_ms(25);
+
+    TXDataPtr = (unsigned char *)TXData;    // TX array start address
+    TXDataSize = sizeof TXData;             // Load TX byte counter
+
+    UCB0I2CSA = (uint8_t) address;          //Set SLAVE address
+    UCB0CTL1 |= UCTR + UCTXSTT;             // I2C TX, start condition
+
+    __bis_SR_register(LPM0_bits + GIE);     // Enter LPM0, enable interrupts
+    __no_operation();                       // Remain in LPM0 until all data
+                                            // is TX'd
+    while (UCB0CTL1 & UCTXSTP);             // Ensure stop condition got sent
 }
 
-extern void ___read_byte(char *rxBuffer)
+extern void ___read_message(char *RXBuffer)
 {
-	P4OUT ^= BIT7;
-    rx_byte_buff = (char) UCB0RXBUF;
-    UCB0RXBUF = 0x0;
-    strncat(rxBuffer, rx_byte_buff, 1);
+    RXDataPtr = (unsigned char *) RXBuffer;   // Start of RX buffer
+    RXDataSize = 0;                              // Clear RX byte count
+    __bis_SR_register(LPM0_bits + GIE);         // Enter LPM0, enable interrupts
+    __no_operation();
 }

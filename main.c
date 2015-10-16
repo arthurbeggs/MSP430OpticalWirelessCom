@@ -15,21 +15,15 @@
 #include "uart.h"
 
 extern int frase_recebida;
-extern volatile unsigned char rx_byte_buff;
+extern unsigned char rx_byte_buff, TXDataSize, *TXDataPtr, RXDataSize, *RXDataPtr;
 
 //Variáveis globais
-volatile char frase_morse[1200];
-volatile char frase_pt[300];
+volatile char frase_morse[400];
+volatile char frase_pt[100];
 volatile char status;	//variável para identificar se esta máquina é master ou slave
 			//'M' - para master
 			//'S' - para slave
 volatile unsigned char rx_buffer = 0;
-
-volatile unsigned char *TXDataPtr;
-volatile unsigned char TXDataSize;
-volatile unsigned int dummy;
-
-
 
 
 void manda_frase(uint8_t address);
@@ -104,17 +98,9 @@ int main(void) {
     		}
     	}
     	else if (status == 'S') {//caso esta maquina seja um Slave
-
-            __bis_SR_register(LPM0_bits + GIE);     // Enter LPM0, enable interrupts
-                                            // Remain in LPM0 until master
-                                            // finishes TX
-            __no_operation();
-
-
-
-    		// while(!frase_recebida) {}//aguardar receber uma frase
-    		// frase_recebida = 0;
+            ___read_message(frase_morse);
     		P4OUT &= ~BIT7;                                                                                 // Flag de depuração
+
 			___send_msg_usci_A1("MORSE: ", 7);
 			___send_msg_usci_A1(frase_morse, strlen(frase_morse));
 			___send_char_usci_A1(10);
@@ -144,18 +130,10 @@ int main(void) {
 }
 
 
-
 void manda_frase(uint8_t address)
 {
-    TXDataPtr = (unsigned char *) frase_morse;
-    TXDataSize = strlen(frase_morse);
-    ___select_SLAVE(address);                           //Sets SLAVE address
-    ___start_transmission();
-
-    __bis_SR_register(LPM0_bits + GIE);     // Enter LPM0, enable interrupts
-    __no_operation();
+    ___send_message(frase_morse, address);
 }
-
 
 
 
@@ -172,25 +150,29 @@ __interrupt void I2C_ISR(void)
             break;
         case  8:                                  // Vector  8: STPIFG
             UCB0IFG &= ~UCSTPIFG;
-            if (dummy >= TXDataSize)                          // Check RX byte counter
+            if (RXDataSize)                       // Check RX byte counter
                 __bic_SR_register_on_exit(LPM0_bits);
             break;
         case 10:                                  // Vector 10: RXIFG
-        	P4OUT ^= BIT7;                                                                                 // Flag de depuração
-            ___read_byte(frase_morse);
-        break;
+        	P4OUT |= BIT7;                                                                                 // Flag de depuração
+            *RXDataPtr++ = UCB0RXBUF;
+            RXDataSize++;
+            break;
         case 12:                                  // Vector 12: TXIFG
-        	P4OUT ^= BIT7;                                                                                 // Flag de depuração
-            for (dummy = 0 ; dummy < TXDataSize ; dummy++)
+        	P4OUT |= BIT7;                                                                                 // Flag de depuração
+            if (TXDataSize)                       // Check TX byte counter
             {
-                ___send_byte((uint8_t) frase_morse[dummy]);     //Send individual bytes
+                UCB0TXBUF = *TXDataPtr++;         // Load TX buffer
+                TXDataSize--;                     // Decrement TX byte counter
             }
-            ___stop_transmission();
-            UCB0IFG &= ~UCTXIFG;
+            else
+            {
+                UCB0CTL1 |= UCTXSTP;                  // I2C stop condition
+                UCB0IFG &= ~UCTXIFG;                  // Clear USCI_B0 TX int flag
+                __bic_SR_register_on_exit(LPM0_bits); // Exit LPM0
+            }
 
-            __bic_SR_register_on_exit(LPM0_bits); // Exit LPM0
-
-        break;
+            break;
         default: break;
     }
 }
