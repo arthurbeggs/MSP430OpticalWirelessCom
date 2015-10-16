@@ -18,7 +18,7 @@
  volatile unsigned char rx_byte_buff;
 
 //identidade para diferenciar um PC do outro
-#define MYID 0x0
+#define MYID 0x1
 
 
 int frase_recebida;

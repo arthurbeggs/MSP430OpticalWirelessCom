@@ -99,15 +99,15 @@ void ___delay_s(int delay)
 
 extern void ___setup_usci_B0()
 {
+    P3SEL |= 0x03;                  // Configure I/O ports
     UCB0CTL1 = UCSWRST;             // Keep module on reset state
-    UCB0CTL0 = UCMODE_3 | UCSYNC;   // I2C mode, 8-bit data, slave mode
-    UCB0CTL1 |= UCSSEL_2;           // BRCLK = SMCLK
+    UCB0CTL0 = UCMODE_3 + UCSYNC;   // I2C mode, 8-bit data, slave mode
+    UCB0CTL1 |= UCSSEL_2 + UCSWRST; // BRCLK = SMCLK
     UCB0BR1 = 0;
-    UCB0BR0 = 4;                    // Prescaler = 4
-    P3SEL |= BIT0 | BIT1;           // Configure I/O ports
+    UCB0BR0 = 12;                   // Prescaler = 4
     UCB0I2COA = (uint8_t) MYID;     // Set own address using MYID defined in main.c
     UCB0CTL1 &= ~UCSWRST;           // Release module for operation
-    UCB0IE |= UCRXIE;     // Enable RX interrupts
+    UCB0IE |= UCRXIE + UCSTTIE + UCSTPIE;     // Enable interrupts
 }
 
 extern void ___switch_to_MASTER()
@@ -117,7 +117,7 @@ extern void ___switch_to_MASTER()
     UCB0RXBUF = 0x0;        // Clear RX buffer
     UCB0TXBUF = 0x0;        // Clear TX buffer
     UCB0CTL1 &= ~UCSWRST;   // Release module
-    UCB0IE |= UCRXIE;       // Enable interrupts
+    UCB0IE |= UCTXIE;     // Enable interrupts
 }
 
 extern void ___switch_to_SLAVE()
@@ -127,7 +127,7 @@ extern void ___switch_to_SLAVE()
     UCB0RXBUF = 0x0;        // Clear RX buffer
     UCB0TXBUF = 0x0;        // Clear TX buffer
     UCB0CTL1 &= ~UCTR & ~UCSWRST;   // Release module and disable transmitter
-    UCB0IE |= UCRXIE;       // Enable interrupts
+    UCB0IE |= UCRXIE + UCSTTIE + UCSTPIE;       // Enable interrupts
 }
 
 extern void ___select_SLAVE(uint8_t address)
@@ -142,27 +142,13 @@ extern void ___stop_transmission()
 
 extern void ___start_transmission()
 {
-
-    UCB0CTL1 |= UCTR;               // Start transmitter
-    UCB0CTL1 |= UCTXSTT;            // Start condition
-
-    __delay_cycles(1000);
-    __no_operation();
+    while (UCB0CTL1 & UCTXSTP);
+    UCB0CTL1 |= UCTR + UCTXSTT;     // Start transmitter and start condition
 }
 
 extern void ___send_byte(uint8_t txByte)
 {
-
-    _no_operation();
-
-    P4OUT ^= BIT7;                  // Flag de depuração
-
-    while(!(UCB0IFG & UCTXIFG)){}   // TX Buffer ready?
     UCB0TXBUF = txByte;             // Send byte
-    // while(!(UCB0IFG & UCTXIFG)){}   // TX Buffer ready?
-
-    __delay_cycles(1000);
-    __no_operation();
 }
 
 extern void ___read_byte(char *rxBuffer)

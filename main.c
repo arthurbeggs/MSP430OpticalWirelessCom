@@ -25,6 +25,11 @@ volatile char status;	//variável para identificar se esta máquina é master ou
 			//'S' - para slave
 volatile unsigned char rx_buffer = 0;
 
+volatile unsigned char *TXDataPtr;
+volatile unsigned char TXDataSize;
+volatile unsigned int dummy;
+
+
 
 
 void manda_frase(uint8_t address);
@@ -34,8 +39,6 @@ void manda_frase(uint8_t address);
 */
 int main(void) {
     WDTCTL = WDTPW | WDTHOLD;   // Stop watchdog timer
-    __disable_interrupt():
-
 
 	//variáveis locais
 	volatile int maquina_destino;
@@ -67,9 +70,6 @@ int main(void) {
     else {  ___switch_to_SLAVE();  }
 
 
-
-    __enable_interrupt();
-
     //LOOP
     while(1) {
     	//caso esta maquina seja o master
@@ -94,7 +94,7 @@ int main(void) {
     			{
     				pisca_morse(frase_morse);//pisca a frase em código morse
     				manda_frase(maquina_destino);//função que manda a frase via I2C para a maquina detino
-    				P4OUT &= ~BIT7;
+    				P4OUT &= ~BIT7;                                                                                 // Flag de depuração
     			}
     			else { //caso seja o comando de troca de master
     				manda_frase(maquina_destino); //manda a frase "mudar master" para o PC destino via I2C
@@ -104,9 +104,17 @@ int main(void) {
     		}
     	}
     	else if (status == 'S') {//caso esta maquina seja um Slave
-    		while(!frase_recebida) {}//aguardar receber uma frase
-    		frase_recebida = 0;
-    		P4OUT &= ~BIT7;
+
+            __bis_SR_register(LPM0_bits + GIE);     // Enter LPM0, enable interrupts
+                                            // Remain in LPM0 until master
+                                            // finishes TX
+            __no_operation();
+
+
+
+    		// while(!frase_recebida) {}//aguardar receber uma frase
+    		// frase_recebida = 0;
+    		P4OUT &= ~BIT7;                                                                                 // Flag de depuração
 			___send_msg_usci_A1("MORSE: ", 7);
 			___send_msg_usci_A1(frase_morse, strlen(frase_morse));
 			___send_char_usci_A1(10);
@@ -139,21 +147,51 @@ int main(void) {
 
 void manda_frase(uint8_t address)
 {
-    volatile int dummy;
-    volatile int len = strlen(frase_morse);
+    TXDataPtr = (unsigned char *) frase_morse;
+    TXDataSize = strlen(frase_morse);
     ___select_SLAVE(address);                           //Sets SLAVE address
     ___start_transmission();
-    for (dummy = 0 ; dummy < len ; dummy++)
-    {
-        ___send_byte((uint8_t) frase_morse[dummy]);     //Send individual bytes
-    }
-    ___stop_transmission();
+
+    __bis_SR_register(LPM0_bits + GIE);     // Enter LPM0, enable interrupts
+    __no_operation();
 }
+
+
+
 
 #pragma vector=USCI_B0_VECTOR
 __interrupt void I2C_ISR(void)
+{
+    switch(__even_in_range(UCB0IV,12))
     {
-         ___read_byte(frase_morse);
-        // if (UCB0IFG & UCSTPIFG) {  frase_recebida = 1;  }
+        case  0: break;                           // Vector  0: No interrupts
+        case  2: break;                           // Vector  2: ALIFG
+        case  4: break;                           // Vector  4: NACKIFG
+        case  6:                                  // Vector  6: STTIFG
+            UCB0IFG &= ~UCSTTIFG;
+            break;
+        case  8:                                  // Vector  8: STPIFG
+            UCB0IFG &= ~UCSTPIFG;
+            if (dummy >= TXDataSize)                          // Check RX byte counter
+                __bic_SR_register_on_exit(LPM0_bits);
+            break;
+        case 10:                                  // Vector 10: RXIFG
+        	P4OUT ^= BIT7;                                                                                 // Flag de depuração
+            ___read_byte(frase_morse);
+        break;
+        case 12:                                  // Vector 12: TXIFG
+        	P4OUT ^= BIT7;                                                                                 // Flag de depuração
+            for (dummy = 0 ; dummy < TXDataSize ; dummy++)
+            {
+                ___send_byte((uint8_t) frase_morse[dummy]);     //Send individual bytes
+            }
+            ___stop_transmission();
+            UCB0IFG &= ~UCTXIFG;
+
+            __bic_SR_register_on_exit(LPM0_bits); // Exit LPM0
+
+        break;
+        default: break;
     }
+}
 
