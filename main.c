@@ -1,16 +1,11 @@
-/*********************************
- * I2C master-slave example
- *
- * Button S2 changes MCU personality
- * Button S1 transmits master byte
- *
- * LED2 on = master
- * LED1 toggles when received master command
- *
- * P3.0 = SDA
- * P3.1 = SCL
- * Remember to pullup both SCA and SCL lines
- *********************************/
+/* Univeridade de Brasilia - UnB
+ * Departamento de Engenharia Eletrica - ENE
+ * Projeto 2 - Comunicação serial com Código Morse
+ * Alunos:  Luan Hackel Araujo      - 12/0125781
+            Arthur Matos            - 12/0111089
+            Jessé Barreto de Barros - 10/0106510
+ * Data: 14/09/2015
+ */
 
 #include <msp430.h> 
 #include <intrinsics.h>
@@ -54,14 +49,6 @@ int main(void) {
     // Configure GPIO
     P1DIR |= BIT0;              // Enable LED output
     P4DIR |= BIT7;              // On = master
-   // P1REN |= BIT1;              // Enable internal resistor
-   // P1OUT |= BIT1;              // Set internal pullup resistor
-  //  P1IE |= BIT1;               // Enable pin interrupts
-  //  P1IFG = 0x0;                // Clear interrupt flags
- //   P2REN |= BIT1;              // Enable internal resistor
- //   P2OUT |= BIT1;              // Set internal pullup resistor
- //   P2IE |= BIT1;               // Enable pin interrupts
- //   P2IFG = 0x0;                // Clear interrupt flags
 
     //Configure clock system
     ___setup_clk0(16000000);
@@ -72,20 +59,6 @@ int main(void) {
     //Sets Universal Serial Communication Interface (USCI) A1
     ___setup_usci_A1(9600);
 
-
-    // Configure clock system
-    // ACLK = 32768HZ
-    // SMCLK = 1MHz
-    // MCLK = 16MHz
-    //UCSCTL0 = 0x0000;           // Set lowest possible DCOx, MODx
-                                // These are controlled by FLL
-    //UCSCTL1 = DCORSEL_5;        // Select DCO range to 16MHz
-    //UCSCTL2 |= 243;             // DCOCLK = 2* (N+1) * 32.768kHz = 16MHz
-    //UCSCTL3 = SELREF_0;         // Set DCO FLL reference = XT1
-    //UCSCTL4 = SELA_0 | SELS_3 | SELM_3 ;    // Set ACLK = XT1,
-                                            // SMCLK = DCOCLK, MCLK = DCOCLK
-    //UCSCTL5 = DIVPA_0 | DIVA_0 | DIVS_4 | DIVM_0;   // Set SMCLK, divide by 16
-    //__delay_cycles(250000);     // Wait for oscillator to stabilize
 
     // Configure USCI module
     UCB0CTL1 = UCSWRST;             // Keep module on reset state
@@ -167,57 +140,7 @@ int main(void) {
                 __low_power_mode_0();
             }
         }
-
-
-       /*
-        switch(state){
-        case GO_MASTER:
-            state = MASTER;
-            UCB0CTL1 |= UCTR | UCSWRST; // Reset module and enable transmitter
-            UCB0CTL0 |= UCMST;      // Set as master
-            UCB0RXBUF = 0x0;        // Clear RX buffer
-            UCB0TXBUF = 0x0;        // Clear TX buffer
-            UCB0I2COA = 0x1;        // Master Address = 0x1
-            UCB0CTL1 &= ~UCSWRST;   // Release module
-            UCB0IE |= UCRXIE;       // Enable interrupts
-            break;
-        case GO_SLAVE:
-            state = SLAVE;
-            UCB0CTL1 |= UCSWRST;    // Reset module
-            UCB0CTL0 &= ~UCMST;     // Set as slave
-            UCB0RXBUF = 0x0;        // Clear RX buffer
-            UCB0TXBUF = 0x0;        // Clear TX buffer
-            UCB0I2COA = 0x2;        // Slave address = 0x2
-            UCB0CTL1 &= ~UCTR & ~UCSWRST;   // Release module and disable transmitter
-            UCB0IE |= UCRXIE;       // Enable interrupts
-            break;
-        }
-        */
-        /*
-        switch(rx_state){
-        case RECEIVED:
-            if(rx_buff == 'm'){
-                P1OUT ^= BIT0;
-            }
-            rx_state = RX_IDLE;
-            break;
-        }
-        */
-        /*
-        switch(tx_state){
-        case SEND:
-            UCB0I2CSA = 0x2;                // Slave address
-            UCB0CTL1 |= UCTXSTT;            //Start condition
-            while(!(UCB0IFG & UCTXIFG)){}   // Buffer ready?
-            UCB0TXBUF = 'm';                // Send char
-            while(!(UCB0IFG & UCTXIFG)){}   // Buffer ready?
-            UCB0CTL1 |= UCTXSTP;            // Stop transmission
-            tx_state = TX_IDLE;
-            break;
-*/
-        }
-
-        
+    }    
     return 0;
 }
 
@@ -233,34 +156,3 @@ __interrupt void SPI_ISR(void){
     }
     __low_power_mode_off_on_exit();
 }
-/*
-#pragma vector=PORT2_VECTOR
-__interrupt void P2_ISR(void){
-    switch(state){
-    case MASTER:
-        tx_state = SEND;
-        break;
-    case SLAVE:
-        break;
-    }
-    P2IFG &= ~BIT1;             // Clear interrupt flag
-    __low_power_mode_off_on_exit();
-}
-*/
-/*
-#pragma vector=PORT1_VECTOR
-__interrupt void P1_ISR(void){
-    switch(state){
-    case MASTER:
-        state = GO_SLAVE;
-        P4OUT &= ~BIT7;
-        break;
-    case SLAVE:
-        state = GO_MASTER;
-        P4OUT |= BIT7;
-        break;
-    }
-    P1IFG &= ~BIT1;                 // Clear interrupt flag
-    __low_power_mode_off_on_exit(); // Execute main loop
-}
-*/
