@@ -32,7 +32,7 @@ extern void ___send_msg_usci_A1(char *rx_buffer, int msg_length)
 		UCA1TXBUF = *(rx_buffer+cnt);
 		//Wait until each bit has been sent
 		while(!(UCTXIFG==(UCTXIFG & UCA1IFG))&&((UCA1STAT & UCBUSY)==UCBUSY));
-		___delay_ms(2);
+		___delay_ms(3);
 	}
 }
 
