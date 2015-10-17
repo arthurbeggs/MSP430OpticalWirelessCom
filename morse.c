@@ -68,8 +68,13 @@ void converte_morse_pt(char* pt, char* morse)
 		letra[j] = '\0';
 
 		for(j=0, achou=0; (j<129) && (!achou); j++)
+		{
 			if(!strcmp(letra, MatMorse[j]))
+			{
 				pt[k++] = j;
+				achou = 1;
+			}
+		}
 
 	}
 }
