@@ -3,6 +3,8 @@
  *
  *  Created on: 16/10/2015
  *      Author: Luan
+ 				Jessé
+ 				Arthur
  */
 
 #ifndef USEFUL_LIB_H_
@@ -18,7 +20,7 @@
  volatile unsigned char rx_byte_buff;
 
 //identidade para diferenciar um PC do outro
-#define MYID 0x2
+#define MYID 0x01
 
 
 int frase_recebida;
