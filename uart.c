@@ -41,6 +41,9 @@ int receber_pc(char* msg_pc)
 	int cnt;
 	int maquina_destino;
 	char *ini_msgg = "DIGITE A MAQUINA DESTINO: "; int msg_len = 26;
+
+	__disable_interrupt();
+
 	___send_msg_usci_A1(ini_msgg, msg_len);
 	for(;;)
 	{
@@ -79,6 +82,8 @@ int receber_pc(char* msg_pc)
 	___delay_ms(3);
 	___send_char_usci_A1(13);
 	___delay_ms(3);
+
+	__enable_interrupt();
 
 	return maquina_destino;
 }
