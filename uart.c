@@ -74,6 +74,11 @@ int receber_pc(char* msg_pc)
 		}
 	}
 
+	___send_char_usci_A1(10);
+	___delay_ms(3);
+	___send_char_usci_A1(13);
+	___delay_ms(3);
+
 	return maquina_destino;
 }
 
