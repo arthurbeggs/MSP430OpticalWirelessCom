@@ -116,29 +116,85 @@ int main(void) {
        
        if(state == MASTER){//master
             maquina_destino = receber_pc(frase_pt);
-            converte_pt_morse(frase_pt, frase_morse);
-            pisca_morse(frase_morse);
 
-            UCB0I2CSA = maquina_destino;    // Slave address
-            UCB0CTL1 |= UCTXSTT;            //Start condition
+            if(!strcmp(frase_pt,"mudar o master"))
+            {
+                converte_pt_morse(frase_pt, frase_morse);
+                UCB0I2CSA = maquina_destino;    // Slave address
+                UCB0CTL1 |= UCTXSTT;            //Start condition
 
-            while(frase_morse[cont_letra] != '\0'){
+                while(frase_morse[cont_letra] != '\0'){
+                    while(!(UCB0IFG & UCTXIFG)){}           // Buffer ready?
+                    UCB0TXBUF = frase_morse[cont_letra++];  // Send char
+                }
                 while(!(UCB0IFG & UCTXIFG)){}           // Buffer ready?
-                UCB0TXBUF = frase_morse[cont_letra++];  // Send char
+                UCB0TXBUF = frase_morse[cont_letra];
+                while(!(UCB0IFG & UCTXIFG)){}   // Buffer ready?
+                UCB0CTL1 |= UCTXSTP;            // Stop transmission
+                tx_state = TX_IDLE;
+                cont_letra = 0;
+
+                //mudar para slave
+                ___delay_ms(200);
+
+                state = SLAVE;
+                UCB0CTL1 |= UCSWRST;    // Reset module
+                UCB0CTL0 &= ~UCMST;     // Set as slave
+                UCB0RXBUF = 0x0;        // Clear RX buffer
+                UCB0TXBUF = 0x0;        // Clear TX buffer
+                UCB0I2COA = MYID;        // Slave address = 0x2
+                UCB0CTL1 &= ~UCTR & ~UCSWRST;   // Release module and disable transmitter
+                UCB0IE |= UCRXIE;       // Enable interrupts
+                status = 'S';
+                P4OUT &= ~BIT7;//apagando led master
+
+
             }
-            while(!(UCB0IFG & UCTXIFG)){}           // Buffer ready?
-            UCB0TXBUF = frase_morse[cont_letra];
-            while(!(UCB0IFG & UCTXIFG)){}   // Buffer ready?
-            UCB0CTL1 |= UCTXSTP;            // Stop transmission
-            tx_state = TX_IDLE;
-            cont_letra = 0;
+            else
+            {
+                converte_pt_morse(frase_pt, frase_morse);
+                pisca_morse(frase_morse);
+
+                UCB0I2CSA = maquina_destino;    // Slave address
+                UCB0CTL1 |= UCTXSTT;            //Start condition
+
+                while(frase_morse[cont_letra] != '\0'){
+                    while(!(UCB0IFG & UCTXIFG)){}           // Buffer ready?
+                    UCB0TXBUF = frase_morse[cont_letra++];  // Send char
+                }
+                while(!(UCB0IFG & UCTXIFG)){}           // Buffer ready?
+                UCB0TXBUF = frase_morse[cont_letra];
+                while(!(UCB0IFG & UCTXIFG)){}   // Buffer ready?
+                UCB0CTL1 |= UCTXSTP;            // Stop transmission
+                tx_state = TX_IDLE;
+                cont_letra = 0;
+            }
        }
        else { //slave
             if(frase_recebida) {
-                pisca_morse(frase_morse);
+
                 converte_morse_pt(frase_pt, frase_morse);
-                manda_frase_pc(frase_pt);
-                frase_recebida = 0;
+
+                if(!strcmp(frase_pt,"MUDAR  O  MASTER"))
+                {
+                    state = MASTER;
+                    UCB0CTL1 |= UCTR | UCSWRST; // Reset module and enable transmitter
+                    UCB0CTL0 |= UCMST;      // Set as master
+                    UCB0RXBUF = 0x0;        // Clear RX buffer
+                    UCB0TXBUF = 0x0;        // Clear TX buffer
+                    UCB0I2COA = MYID;        // Master Address = 0x1
+                    UCB0CTL1 &= ~UCSWRST;   // Release module
+                    UCB0IE |= UCRXIE;       // Enable interrupts
+                    status = 'M';
+                    //acender led master
+                    P4OUT |= BIT7;
+                }
+                else
+                {
+                    pisca_morse(frase_morse);
+                    manda_frase_pc(frase_pt);
+                    frase_recebida = 0;
+                }
             }
             else{
                 __low_power_mode_0();
