@@ -49,6 +49,7 @@ int main(void) {
     // Configure GPIO
     P1DIR |= BIT0;              // Enable LED output
     P4DIR |= BIT7;              // On = master
+    P4OUT &= ~BIT7;//apagando o led do master
 
     //Configure clock system
     ___setup_clk0(16000000);
@@ -91,6 +92,8 @@ int main(void) {
         UCB0CTL1 &= ~UCSWRST;   // Release module
         UCB0IE |= UCRXIE;       // Enable interrupts
         status = 'M';
+        //acender led master
+        P4OUT |= BIT7;
     }
     else {  
 
@@ -103,6 +106,7 @@ int main(void) {
         UCB0CTL1 &= ~UCTR & ~UCSWRST;   // Release module and disable transmitter
         UCB0IE |= UCRXIE;       // Enable interrupts
         status = 'S';
+        P4OUT &= ~BIT7;//apagando led master 
 
     }
 
