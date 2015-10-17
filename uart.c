@@ -72,8 +72,9 @@ int receber_pc(char* msg_pc)
 			*(msg_pc+cnt)=c;
 			___send_char_usci_A1(*(msg_pc+cnt));
 		}
-	}
 
+	}
+	*(msg_pc+cnt)='\0';
 	___send_char_usci_A1(10);
 	___delay_ms(3);
 	___send_char_usci_A1(13);
