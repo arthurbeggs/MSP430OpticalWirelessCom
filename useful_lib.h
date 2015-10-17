@@ -1,8 +1,8 @@
 /*
  * useful_lib.h
  *
- *  Created on: 16/09/2015
- *      Author: jesse
+ *  Created on: 16/10/2015
+ *      Author: Luan
  */
 
 #ifndef USEFUL_LIB_H_
@@ -18,7 +18,7 @@
  volatile unsigned char rx_byte_buff;
 
 //identidade para diferenciar um PC do outro
-#define MYID 0x1
+#define MYID 0x2
 
 
 int frase_recebida;
@@ -53,30 +53,32 @@ extern void ___send_char_usci_A1(char rx);
 
 
 //Sets the USCI (I2C) in B0
-extern void ___setup_usci_B0();
+//extern void ___setup_usci_B0();
 
 //Switch to Master
-extern void ___switch_to_MASTER();
+//extern void ___switch_to_MASTER();
 
 //Switch to Slave
-extern void ___switch_to_SLAVE();
+//extern void ___switch_to_SLAVE();
 
 //Slave select
-extern void ___select_SLAVE(uint8_t address);
+//extern void ___select_SLAVE(uint8_t address);
 
 //Stop transmission
-extern void ___stop_transmission();
+//extern void ___stop_transmission();
 
 //Start transmission
-extern void ___start_transmission();
+//extern void ___start_transmission();
 
 //Send byte
-extern void ___send_byte(uint8_t txByte);
+//extern void ___send_byte(uint8_t txByte);
 
 //Receives a char from the PC
-extern void ___uscia1_receive_char_pc(char* char_pc);
+//extern void ___uscia1_receive_char_pc(char* char_pc);
 
 //Receive byte
-extern void ___read_byte(char *rxBuffer);
+//extern void ___read_byte(char *rxBuffer);
+
+
 
 #endif /* USEFUL_LIB_H_ */

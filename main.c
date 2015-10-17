@@ -1,197 +1,266 @@
-/* Univeridade de Brasilia - UnB
- * Departamento de Engenharia Eletrica - ENE
- * Projeto 2 - Comunicação serial com Código Morse
- * Alunos: 	Luan Hackel Araujo		- 12/0125781
-			Arthur Matos			- 12/0111089
-			Jessé Barreto de Barros - 10/0106510
- * Data: 14/09/2015
- */
+/*********************************
+ * I2C master-slave example
+ *
+ * Button S2 changes MCU personality
+ * Button S1 transmits master byte
+ *
+ * LED2 on = master
+ * LED1 toggles when received master command
+ *
+ * P3.0 = SDA
+ * P3.1 = SCL
+ * Remember to pullup both SCA and SCL lines
+ *********************************/
 
-//Libraries
-#include <msp430.h> //Common used library
-#include "useful_lib.h" //Useful functions
-#include "morse.h"//morse function
-#include <string.h>//funções para tratar strings
+#include <msp430.h> 
+#include <intrinsics.h>
+#include "useful_lib.h"
+#include "morse.h"
 #include "uart.h"
+#include <string.h>
 
-extern int frase_recebida;
-extern volatile unsigned char rx_byte_buff;
+volatile unsigned char rx_buff = 0;
 
-//Variáveis globais
+volatile enum _tx_state{
+    TX_IDLE = 0,
+    SEND
+} tx_state;
+
+volatile enum _rx_state{
+    RX_IDLE = 0,
+    RECEIVED
+} rx_state;
+
+volatile enum _state{
+    MASTER = 0,
+    SLAVE,
+    GO_MASTER,
+    GO_SLAVE
+} state;
+
+volatile int maquina_destino;
+int frase_recebida;
+int cont_letra;
+volatile char status;   //variável para identificar se esta máquina é master ou slave
+            //'M' - para master
+            //'S' - para slave
 volatile char frase_morse[1200];
 volatile char frase_pt[300];
-volatile char status;	//variável para identificar se esta máquina é master ou slave
-			//'M' - para master
-			//'S' - para slave
-volatile unsigned char rx_buffer = 0;
-
-volatile unsigned char *TXDataPtr;
-volatile unsigned char TXDataSize;
-volatile unsigned int dummy;
 
 
-
-
-void manda_frase(uint8_t address);
-
-/*
- * main.c
-*/
 int main(void) {
     WDTCTL = WDTPW | WDTHOLD;   // Stop watchdog timer
+    
+    // Configure GPIO
+    P1DIR |= BIT0;              // Enable LED output
+    P4DIR |= BIT7;              // On = master
+   // P1REN |= BIT1;              // Enable internal resistor
+   // P1OUT |= BIT1;              // Set internal pullup resistor
+  //  P1IE |= BIT1;               // Enable pin interrupts
+  //  P1IFG = 0x0;                // Clear interrupt flags
+ //   P2REN |= BIT1;              // Enable internal resistor
+ //   P2OUT |= BIT1;              // Set internal pullup resistor
+ //   P2IE |= BIT1;               // Enable pin interrupts
+ //   P2IFG = 0x0;                // Clear interrupt flags
 
-	//variáveis locais
-	volatile int maquina_destino;
-
-    frase_recebida = 0;
-
-    //SETUP
-
-
-	//Configure clock system
+    //Configure clock system
     ___setup_clk0(16000000);
 
     //Sets timerA0 using clock0
-	___setup_timerA0();
+    ___setup_timerA0();
 
-	//Sets Universal Serial Communication Interface (USCI) A1
-	___setup_usci_A1(9600);
-
-    //Sets Universal Serial Communication Interface (USCI) B0
-    ___setup_usci_B0();
+    //Sets Universal Serial Communication Interface (USCI) A1
+    ___setup_usci_A1(9600);
 
 
-    //setando variáveis iniciais
-    init();
+    // Configure clock system
+    // ACLK = 32768HZ
+    // SMCLK = 1MHz
+    // MCLK = 16MHz
+    //UCSCTL0 = 0x0000;           // Set lowest possible DCOx, MODx
+                                // These are controlled by FLL
+    //UCSCTL1 = DCORSEL_5;        // Select DCO range to 16MHz
+    //UCSCTL2 |= 243;             // DCOCLK = 2* (N+1) * 32.768kHz = 16MHz
+    //UCSCTL3 = SELREF_0;         // Set DCO FLL reference = XT1
+    //UCSCTL4 = SELA_0 | SELS_3 | SELM_3 ;    // Set ACLK = XT1,
+                                            // SMCLK = DCOCLK, MCLK = DCOCLK
+    //UCSCTL5 = DIVPA_0 | DIVA_0 | DIVS_4 | DIVM_0;   // Set SMCLK, divide by 16
+    //__delay_cycles(250000);     // Wait for oscillator to stabilize
+
+    // Configure USCI module
+    UCB0CTL1 = UCSWRST;             // Keep module on reset state
+    UCB0CTL0 = UCMODE_3 | UCSYNC;   // I2C mode, 8-bit data, slave mode
+    UCB0CTL1 |= UCSSEL_2;           // BRCLK = SMCLK = 1MHz
+    UCB0BR1 = 0;
+    UCB0BR0 = 4;                    // Prescaler = 4
+    P3SEL |= BIT0 | BIT1;           // Configure I/O ports
+    //UCB0STAT |= UCLISTEN;         // Loopback
+    UCB0CTL1 &= ~UCSWRST;           // Release module for operation
+    UCB0IE |= UCRXIE;               // Enable RX interrupts
+
+    // Deafult state = SLAVE
+    state = SLAVE;
+    UCB0I2COA = MYID;                // slave address = 0x2
+    P4OUT &= ~BIT7;
+    
+    frase_recebida = 0;
+    cont_letra = 0;
 
     status = status_inicial();//função que se comunica com o PC via UART pergunta o usuário se essa maquina será master ou slave, retorna 'M' para master ou 'S' para slave
 
-    if (status == 'M'){  ___switch_to_MASTER();  }
-    else {  ___switch_to_SLAVE();  }
+    if (status == 'M'){
+        state = MASTER;
+        UCB0CTL1 |= UCTR | UCSWRST; // Reset module and enable transmitter
+        UCB0CTL0 |= UCMST;      // Set as master
+        UCB0RXBUF = 0x0;        // Clear RX buffer
+        UCB0TXBUF = 0x0;        // Clear TX buffer
+        UCB0I2COA = MYID;        // Master Address = 0x1
+        UCB0CTL1 &= ~UCSWRST;   // Release module
+        UCB0IE |= UCRXIE;       // Enable interrupts
+        status = 'M';
+    }
+    else {  
 
-
-    //LOOP
-    while(1) {
-    	//caso esta maquina seja o master
-    	if(status == 'M')
-    	{
-    		maquina_destino = receber_pc(frase_pt);//função que pede e recebe uma frase do PC e guarda na variável global frase, e pedi o PC destino (número de 0 à 2) e retrna esse número
-    		converte_pt_morse(frase_pt, frase_morse);
-    		___send_char_usci_A1(10);
-    		___send_char_usci_A1(13);
-    		___send_msg_usci_A1("MORSE: ", 7);
-    		___send_msg_usci_A1(frase_morse, strlen(frase_morse));
-            if(maquina_destino == MYID)//caso esteja mandando uma frase para se mesmo
-    		{
-    			if(strcmp(frase_pt, "mudar master"))//caso não seja o comendo de troca de mestre
-    			{
-    				pisca_morse(frase_morse);//pisca a frase em código morse
-    			}
-    			//caso seja o comando de troca de master não fazer nada, pois esta maquina já é o master
-    		}
-    		else {//caso esteja mandando para uma outra máquina
-    			if(strcmp(frase_pt, "mudar master"))//caso não seja o comando de troca de mestre
-    			{
-    				pisca_morse(frase_morse);//pisca a frase em código morse
-    				manda_frase(maquina_destino);//função que manda a frase via I2C para a maquina detino
-    				P4OUT &= ~BIT7;                                                                                 // Flag de depuração
-    			}
-    			else { //caso seja o comando de troca de master
-    				manda_frase(maquina_destino); //manda a frase "mudar master" para o PC destino via I2C
-                    ___switch_to_SLAVE();
-    				status = 'S';//muda seu status para Slave
-    			}
-    		}
-    	}
-    	else if (status == 'S') {//caso esta maquina seja um Slave
-
-            __bis_SR_register(LPM0_bits + GIE);     // Enter LPM0, enable interrupts
-                                            // Remain in LPM0 until master
-                                            // finishes TX
-            __no_operation();
-
-
-
-    		// while(!frase_recebida) {}//aguardar receber uma frase
-    		// frase_recebida = 0;
-    		P4OUT &= ~BIT7;                                                                                 // Flag de depuração
-			___send_msg_usci_A1("MORSE: ", 7);
-			___send_msg_usci_A1(frase_morse, strlen(frase_morse));
-			___send_char_usci_A1(10);
-			___send_char_usci_A1(13);
-            converte_morse_pt(frase_pt, frase_morse);
-            ___send_msg_usci_A1("FRASE: ", strlen(frase_pt));
-            ___send_msg_usci_A1(frase_pt, strlen(frase_pt));
-    		if(strcmp(frase_pt, "mudar master"))//caso não seja o camando de troca de mestre
-			{
-				pisca_morse(frase_morse);//pisca a frase em código morse
-				manda_frase_pc(frase_pt);//função que manda a frase via UART para o PC
-			}
-			else { //caso seja o comando de troca de master
-                ___switch_to_MASTER();
-				status = 'M';//muda seu status para Master
-			}
-
-    	}
-    	else {
-    		//variável de status indefinida tratar erro!!
-    	}
+        state = SLAVE;
+        UCB0CTL1 |= UCSWRST;    // Reset module
+        UCB0CTL0 &= ~UCMST;     // Set as slave
+        UCB0RXBUF = 0x0;        // Clear RX buffer
+        UCB0TXBUF = 0x0;        // Clear TX buffer
+        UCB0I2COA = MYID;        // Slave address = 0x2
+        UCB0CTL1 &= ~UCTR & ~UCSWRST;   // Release module and disable transmitter
+        UCB0IE |= UCRXIE;       // Enable interrupts
+        status = 'S';
 
     }
 
+    //__low_power_mode_0();
 
-	return 0;
+    while(1){
+       
+       if(state == MASTER){//master
+            maquina_destino = receber_pc(frase_pt);
+            converte_pt_morse(frase_pt, frase_morse);
+            pisca_morse(frase_morse);
+
+            UCB0I2CSA = maquina_destino;    // Slave address
+            UCB0CTL1 |= UCTXSTT;            //Start condition
+
+            while(frase_morse[cont_letra] != '\0'){
+                while(!(UCB0IFG & UCTXIFG)){}           // Buffer ready?
+                UCB0TXBUF = frase_morse[cont_letra++];  // Send char
+            }
+            while(!(UCB0IFG & UCTXIFG)){}           // Buffer ready?
+            UCB0TXBUF = frase_morse[cont_letra];
+            while(!(UCB0IFG & UCTXIFG)){}   // Buffer ready?
+            UCB0CTL1 |= UCTXSTP;            // Stop transmission
+            tx_state = TX_IDLE;
+            cont_letra = 0;
+       }
+       else { //slave
+            if(frase_recebida) {
+                pisca_morse(frase_morse);
+                converte_morse_pt(frase_pt, frase_morse);
+                manda_frase_pc(frase_pt);
+                frase_recebida = 0;
+            }
+            else{
+                __low_power_mode_0();
+            }
+        }
+
+
+       /*
+        switch(state){
+        case GO_MASTER:
+            state = MASTER;
+            UCB0CTL1 |= UCTR | UCSWRST; // Reset module and enable transmitter
+            UCB0CTL0 |= UCMST;      // Set as master
+            UCB0RXBUF = 0x0;        // Clear RX buffer
+            UCB0TXBUF = 0x0;        // Clear TX buffer
+            UCB0I2COA = 0x1;        // Master Address = 0x1
+            UCB0CTL1 &= ~UCSWRST;   // Release module
+            UCB0IE |= UCRXIE;       // Enable interrupts
+            break;
+        case GO_SLAVE:
+            state = SLAVE;
+            UCB0CTL1 |= UCSWRST;    // Reset module
+            UCB0CTL0 &= ~UCMST;     // Set as slave
+            UCB0RXBUF = 0x0;        // Clear RX buffer
+            UCB0TXBUF = 0x0;        // Clear TX buffer
+            UCB0I2COA = 0x2;        // Slave address = 0x2
+            UCB0CTL1 &= ~UCTR & ~UCSWRST;   // Release module and disable transmitter
+            UCB0IE |= UCRXIE;       // Enable interrupts
+            break;
+        }
+        */
+        /*
+        switch(rx_state){
+        case RECEIVED:
+            if(rx_buff == 'm'){
+                P1OUT ^= BIT0;
+            }
+            rx_state = RX_IDLE;
+            break;
+        }
+        */
+        /*
+        switch(tx_state){
+        case SEND:
+            UCB0I2CSA = 0x2;                // Slave address
+            UCB0CTL1 |= UCTXSTT;            //Start condition
+            while(!(UCB0IFG & UCTXIFG)){}   // Buffer ready?
+            UCB0TXBUF = 'm';                // Send char
+            while(!(UCB0IFG & UCTXIFG)){}   // Buffer ready?
+            UCB0CTL1 |= UCTXSTP;            // Stop transmission
+            tx_state = TX_IDLE;
+            break;
+*/
+        }
+
+        
+    return 0;
 }
-
-
-
-void manda_frase(uint8_t address)
-{
-    TXDataPtr = (unsigned char *) frase_morse;
-    TXDataSize = strlen(frase_morse);
-    ___select_SLAVE(address);                           //Sets SLAVE address
-    ___start_transmission();
-
-    __bis_SR_register(LPM0_bits + GIE);     // Enter LPM0, enable interrupts
-    __no_operation();
-}
-
-
-
 
 #pragma vector=USCI_B0_VECTOR
-__interrupt void I2C_ISR(void)
-{
-    switch(__even_in_range(UCB0IV,12))
-    {
-        case  0: break;                           // Vector  0: No interrupts
-        case  2: break;                           // Vector  2: ALIFG
-        case  4: break;                           // Vector  4: NACKIFG
-        case  6:                                  // Vector  6: STTIFG
-            UCB0IFG &= ~UCSTTIFG;
-            break;
-        case  8:                                  // Vector  8: STPIFG
-            UCB0IFG &= ~UCSTPIFG;
-            if (dummy >= TXDataSize)                          // Check RX byte counter
-                __bic_SR_register_on_exit(LPM0_bits);
-            break;
-        case 10:                                  // Vector 10: RXIFG
-        	P4OUT ^= BIT7;                                                                                 // Flag de depuração
-            ___read_byte(frase_morse);
-        break;
-        case 12:                                  // Vector 12: TXIFG
-        	P4OUT ^= BIT7;                                                                                 // Flag de depuração
-            for (dummy = 0 ; dummy < TXDataSize ; dummy++)
-            {
-                ___send_byte((uint8_t) frase_morse[dummy]);     //Send individual bytes
-            }
-            ___stop_transmission();
-            UCB0IFG &= ~UCTXIFG;
-
-            __bic_SR_register_on_exit(LPM0_bits); // Exit LPM0
-
-        break;
-        default: break;
+__interrupt void SPI_ISR(void){
+    rx_buff = UCB0RXBUF;
+    UCB0RXBUF = 0x0;//crear RX buffer
+    rx_state = RECEIVED;
+    frase_morse[cont_letra++] = rx_buff;
+    if(rx_buff == '\0'){
+        frase_recebida = 1;
+        cont_letra = 0;
     }
+    __low_power_mode_off_on_exit();
 }
-
+/*
+#pragma vector=PORT2_VECTOR
+__interrupt void P2_ISR(void){
+    switch(state){
+    case MASTER:
+        tx_state = SEND;
+        break;
+    case SLAVE:
+        break;
+    }
+    P2IFG &= ~BIT1;             // Clear interrupt flag
+    __low_power_mode_off_on_exit();
+}
+*/
+/*
+#pragma vector=PORT1_VECTOR
+__interrupt void P1_ISR(void){
+    switch(state){
+    case MASTER:
+        state = GO_SLAVE;
+        P4OUT &= ~BIT7;
+        break;
+    case SLAVE:
+        state = GO_MASTER;
+        P4OUT |= BIT7;
+        break;
+    }
+    P1IFG &= ~BIT1;                 // Clear interrupt flag
+    __low_power_mode_off_on_exit(); // Execute main loop
+}
+*/
