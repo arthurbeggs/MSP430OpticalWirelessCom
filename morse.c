@@ -82,6 +82,8 @@ void converte_morse_pt(char* pt, char* morse)
 			}
 		}
 
+		pt[k] = '\0';
+
 	}
 }
 
