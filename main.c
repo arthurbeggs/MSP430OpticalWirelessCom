@@ -83,6 +83,7 @@ int main(void) {
     status = status_inicial();//função que se comunica com o PC via UART pergunta o usuário se essa maquina será master ou slave, retorna 'M' para master ou 'S' para slave
 
     if (status == 'M'){
+
         state = MASTER;
         UCB0CTL1 |= UCTR | UCSWRST; // Reset module and enable transmitter
         UCB0CTL0 |= UCMST;      // Set as master
@@ -177,6 +178,7 @@ int main(void) {
 
                 if(!strcmp(frase_pt,"MUDAR  O  MASTER"))
                 {
+                    
                     state = MASTER;
                     UCB0CTL1 |= UCTR | UCSWRST; // Reset module and enable transmitter
                     UCB0CTL0 |= UCMST;      // Set as master
