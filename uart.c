@@ -68,7 +68,13 @@ int receber_pc(char* msg_pc)
 	for(cnt=0;;cnt++)
 	{
 		___receive_char_usci_A1(&c);
-		if(c==13  || cnt >= 300)
+		if(c==8 || c==127)
+		{
+			cnt--;
+			*(msg_pc+cnt--)=0;
+			___send_char_usci_A1(c);
+		}
+		else if(c==13  || cnt >= 300)
 			break;
 		else
 		{
