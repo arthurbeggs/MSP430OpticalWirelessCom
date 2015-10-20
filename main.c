@@ -13,43 +13,28 @@
 #include "morse.h"
 #include "uart.h"
 #include <string.h>
+#include "i2c.h"
 
-volatile unsigned char rx_buff = 0;
-
-volatile enum _tx_state{
-    TX_IDLE = 0,
-    SEND
-} tx_state;
-
-volatile enum _rx_state{
-    RX_IDLE = 0,
-    RECEIVED
-} rx_state;
-
-volatile enum _state{
-    MASTER = 0,
-    SLAVE,
-    GO_MASTER,
-    GO_SLAVE
-} state;
-
-volatile int maquina_destino;
-int frase_recebida;
-int cont_letra;
-volatile char status;   //variável para identificar se esta máquina é master ou slave
-            //'M' - para master
-            //'S' - para slave
 volatile char frase_morse[1200];
 volatile char frase_pt[300];
-
+int cont_letra;
 
 int main(void) {
+    volatile int maquina_destino;
+    int frase_recebida;
+    volatile char status;   //variável para identificar se esta máquina é master ou slave
+                //'M' - para master
+                //'S' - para slave
+
     WDTCTL = WDTPW | WDTHOLD;   // Stop watchdog timer
     
     // Configure GPIO
     P1DIR |= BIT0;              // Enable LED output
     P4DIR |= BIT7;              // On = master
     P4OUT &= ~BIT7;//apagando o led do master
+
+    //iniciando a I2C
+    ___initI2C();
 
     //Configure clock system
     ___setup_clk0(16000000);
