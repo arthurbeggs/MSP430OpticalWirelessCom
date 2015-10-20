@@ -15,9 +15,9 @@
  void dot(void)
 {
 	P1OUT |= BIT0;
-	___delay_ms(250);
+	___delay_ms(50);
 	P1OUT &= ~(BIT0);
-	___delay_ms(250);
+	___delay_ms(50);
 
 	return;
 }
@@ -25,16 +25,16 @@
 void dash(void)
 {
 	P1OUT |= BIT0;
-	___delay_ms(750);
+	___delay_ms(150);
 	P1OUT &= ~(BIT0);
-	___delay_ms(250);
+	___delay_ms(50);
 
 	return;
 }
 
 void space(void)
 {
-	___delay_ms(500);
+	___delay_ms(100);
 
 	return;
 }
